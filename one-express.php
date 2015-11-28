@@ -299,24 +299,3 @@ require_once(ONEXPLUGINDIR . 'onex-main.php');
 //require_once(ONEXPLUGINDIR . 'jenis-delivery/onex-jenis-delivery-hapus.php');
 // require_once(ONEXPLUGINDIR . 'bank/onex-bank.php');
 // require_once(ONEXPLUGINDIR . 'jenis-menu/onex-jenis-menu.php');
-
-/*function one_express_install(){
-	global $wpdb;
-	$onex_katdel_table_name = "onex_kategori_delivery";
-
-	if($wpdb->get_var("SHOW TABLES LIKE '$onex_katdel_table_name'") == $onex_katdel_table_name){
-		$wpdb->insert(
-			$onex_katdel_table_name,
-			array(
-				"kategori" => "Food Delivery",
-				"keterangan" => "delivery khusus antar makanan dari restaurant ke pelanggan"
-			),
-			array('%s', '%s')
-		);
-	}
-}
-register_activation_hook(__FILE__, 'one_express_install');
-
-define('ONEXPLUGINDIR', plugin_dir_path(__FILE__));
-require_once(ONEXPLUGINDIR . 'onex-main.php');
-include(ONEXPLUGINDIR . 'includes/onex-menu.php');*/
