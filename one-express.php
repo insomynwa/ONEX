@@ -22,65 +22,6 @@ class Onex_Plugin{
 
 		/**
 		*
-		* CREATE PAGES
-		*
-		*/
-		/*$page_definitions =
-			array(
-				'delivery-put' =>
-					array(
-						'title' => __( 'Delivery put', 'one-express'),
-						'content' => '',
-						'template' => 'delivery-put.php',
-					),
-				'delivery-document-and-package' =>
-					array(
-						'title' => __( 'Delivery document & Package', 'one-express'),
-						'content' => '',
-						'template' => 'delivery-document-and-package.php',
-					),
-				'delivery-shopping' =>
-					array(
-						'title' => __( 'Delivery Shopping', 'one-express'),
-						'content' => '',
-						'template' => 'delivery-shopping.php',
-					),
-			);
-
-		foreach ( $page_definitions as $slug => $page ){
-			$query = new WP_Query( 'pagename=' . $slug );
-
-			if ( !$query->have_posts()){
-
-				$post_id = 
-					wp_insert_post(
-						array(
-							'post_content' => $page['content'],
-							'post_name' => $slug,
-							'post_title' => $page['title'],
-							'post_status' => 'publish',
-							'post_type' => 'page',
-							'ping_status' => 'closed',
-							'comment_status' => 'closed'
-						)
-					);
-
-				if( $page['template'] != '' ){
-
-					$page_template = locate_template( $page['template'] );
-					if( $page_template != '' && $post_id ){
-						update_post_meta( $post_id, '_wp_page_template', $page['template'] );
-					}else{
-						wp_die("Template hasn't been created.");
-					}
-						
-				}
-
-			}
-		}*/
-
-		/**
-		*
 		* INSERT DATA
 		*
 		*/
@@ -282,6 +223,12 @@ $onex_plugin_obj = new Onex_Plugin();
 function get_jenis_delivery(){
 	$delivery_obj = new Onex_Jenis_Delivery();
 	$content = $delivery_obj->DeliveryList();
+	return $content;
+}
+
+function get_distributor_by_template($template_name){
+	$distributor = new Onex_Distributor();
+	$content = $distributor->GetDistributorByTemplate($template_name);
 	return $content;
 }
 

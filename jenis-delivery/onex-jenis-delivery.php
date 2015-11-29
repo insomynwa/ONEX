@@ -26,6 +26,23 @@ class Onex_Jenis_Delivery{
 		//return $this->getHtmlTemplate('delivery_list', $attributes);
 	}
 
+	public function GetJenisDeliveryByTemplate($template_id){
+		global $wpdb;
+
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name WHERE template_id = %d",
+					$template_id
+				), ARRAY_A
+			);
+
+		if( !is_null($row) && !empty($row))
+			return $row['id_kat_del'];
+
+		return 0;
+	}
+
 	public function AddDelivery($data){
 		global $wpdb;
 		//$table_kat_del_name = "onex_kategori_delivery";
