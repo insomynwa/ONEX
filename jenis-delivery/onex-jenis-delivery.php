@@ -1,10 +1,36 @@
 <?php
 
+include_once(WP_PLUGIN_DIR . '\one-express\distributor\onex-distributor.php');
 class Onex_Jenis_Delivery{
 	private $table_name;
 
 	public function __construct(){
 		$this->table_name = "onex_kategori_delivery";
+
+		add_action('wp_print_scripts', array( $this, 'AjaxDeliveryLoadScripts'));
+		add_action('wp_ajax_AjaxGetJenisDeliveryList', array( $this, 'AjaxLoad_JenisDelivery_List') );
+		add_action('wp_ajax_AjaxGetJenisDeliveryDetail', array( $this, 'AjaxLoad_JenisDelivery_Detail') );
+	}
+
+	function AjaxDeliveryLoadScripts(){
+		wp_localize_script( 'ajax-delivery', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php')) );
+	}
+
+	function AjaxLoad_JenisDelivery_List(){
+		$attributes = $this->DeliveryList();
+		echo $this->getHtmlTemplate( 'templates/', 'delivery_list', $attributes );
+		wp_die();
+	}
+
+	function AjaxLoad_JenisDelivery_Detail(){
+		if( isset( $_GET['katdel']) ){
+			$attributes = $this->GetDelivery( $_GET['katdel'] );
+			$onex_distributor_obj = new Onex_Distributor();
+			$attributes['katdel_rel'] = $onex_distributor_obj->GetDistributorByJenisDelivery( $_GET['katdel']);
+
+			echo $this->getHtmlTemplate( 'templates/', 'delivery_detail', $attributes );
+		}
+		wp_die();
 	}
 
 	public function DeliveryList(){
@@ -71,7 +97,7 @@ class Onex_Jenis_Delivery{
 					$id
 				), ARRAY_A
 			);
-		$attributes['kat_del'] = $row;
+		$attributes['katdel'] = $row;
 		return $attributes;
 	}
 
@@ -107,6 +133,16 @@ class Onex_Jenis_Delivery{
 		}else{
 			return "Terjadi Kesalahan.";
 		}
+	}
+
+	private function getHtmlTemplate( $location, $template_name, $attributes = null ){
+		if(! $attributes) $attributes = array();
+
+		ob_start();
+		require( $location . $template_name . '.php');
+		$html = ob_get_contents();
+		ob_end_clean();
+		echo $html;
 	}
 }
 ?>

@@ -10,6 +10,37 @@ class Onex_Distributor{
 	function __construct(){
 		$this->table_name = "onex_distributor";
 		$this->table_jenis_delivery = "onex_kategori_delivery";
+
+		add_action('wp_print_scripts', array( $this, 'AjaxDistributorLoadScripts')) ;
+		add_action('wp_ajax_AjaxGetDistributorList', array( $this, 'AjaxLoad_Distributor_List')) ;
+		add_action('wp_ajax_AjaxGetDistributorDetail', array( $this, 'AjaxLoad_Distributor_Detail')) ;
+	}
+
+	function AjaxDistributorLoadScripts(){
+		// load our jquery file that sends the $.post request
+		wp_enqueue_script( "ajax-distributor", plugin_dir_url( __FILE__ ) . '../js/ajax-distributor.js', array( 'jquery' ) );
+	 
+		// make the ajaxurl var available to the above script
+		wp_localize_script( 'ajax-distributor', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );	
+	}
+
+	function AjaxLoad_Distributor_List(){
+		$attributes = $this->DistributorList();
+		echo $this->getHtmlTemplate(  'templates/', 'distributor_list', $attributes);
+		wp_die();
+	}
+
+	function AjaxLoad_Distributor_Detail(){
+		// first check if data is being sent and that it is the data we want
+	  	if ( isset( $_GET["distributor"] ) ) {
+			// now set our response var equal to that of the POST var (this will need to be sanitized based on what you're doing with with it)
+			//$response = $_GET["distributor"];
+			// send the response back to the front end
+			$attributes = $this->GetDistributor($_GET["distributor"]);
+			
+			echo $this->getHtmlTemplate(  'templates/', 'distributor_detail', $attributes);
+			wp_die();
+		}
 	}
 
 	public function DistributorList(){
@@ -62,6 +93,25 @@ class Onex_Distributor{
 			}
 		}
 
+		return $attributes;
+	}
+
+	public function GetDistributorByJenisDelivery($id){
+		global $wpdb;
+
+		$attributes = null;
+
+		if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
+
+			$attributes['distributor'] = 
+				$wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT * FROM $this->table_name
+						WHERE kategori_delivery = %d",
+						$id
+					)
+				);
+		}
 		return $attributes;
 	}
 
@@ -157,49 +207,16 @@ class Onex_Distributor{
 		$attributes['distributor'] = $row;
 		return $attributes;
 	}
-}
-/*function onex_distributor_page(){
-	echo '<div class="wrap">';
-	echo '<h2>Daftar Distributor</h2>';
-	echo '<a href="'. admin_url('admin.php?page=onex-distributor-tambah') .'">Tambah</a>';
 
-	echo "<table class='wp-list-table widefat fixed'>";
-	echo "<tr><th>id</th>
-		<th>nama</th>
-		<th>jenis delivery</th>
-		<th>alamat</th>
-		<th>no. telp</th>
-		<th>e-mail</th>
-		<th>keterangan</th>
-		<th></th></tr>";
+	private function getHtmlTemplate( $location, $template_name, $attributes = null ){
+		if(! $attributes) $attributes = array();
 
-	global $wpdb;
-	$tbl_onex_distributor = 'onex_distributor';
-	$tbl_onex_kategori_delivery = 'onex_kategori_delivery';
-	$rows = $wpdb->get_results(
-		$wpdb->prepare(
-			"SELECT d.*, kd.kategori FROM $tbl_onex_distributor d
-			 LEFT JOIN $tbl_onex_kategori_delivery kd
-			 ON d.kategori_delivery=kd.id_kat_del
-			",null
-		)
-	);
-	foreach($rows as $row){
-		echo "<tr>";
-		echo "<td>$row->id_dist</td>";
-		echo "<td>$row->nama</td>";
-		echo "<td>$row->kategori</td>";
-		echo "<td>$row->alamat</td>";
-		echo "<td>$row->telp</td>";
-		echo "<td>$row->email</td>";
-		echo "<td>$row->keterangan</td>";
-		echo "<td><a href='". admin_url('admin.php?page=onex-distributor-hapus&id='. $row->id_dist) ."'>Hapus</a> | ";
-		echo "<a href='". admin_url('admin.php?page=onex-distributor-update&id='. $row->id_dist) ."'>Update</a></td>";
-		echo "</tr>";
+		ob_start();
+		require( $location . $template_name . '.php');
+		$html = ob_get_contents();
+		ob_end_clean();
+		echo $html;
 	}
-	echo "</table>";
-	echo "<a href='". admin_url('admin.php?page=onex-distributor-tambah') . "' >Tambah</a>";
+}
 
-	echo '</div>';
-}*/
 ?>
