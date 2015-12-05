@@ -49,39 +49,6 @@ class Onex_Kategori_Menu{
 		return $attributes;
 	}
 
-	public function GetDistributorByTemplate($template_name){
-		global $wpdb;
-
-		$template = new Onex_Template();
-
-		$template_id = $template->GetTemplateIdByName($template_name);
-			
-		$attributes = null;
-
-		if($template_id){
-
-			$kat_delivery = new Onex_Jenis_Delivery();
-
-			$kat_del_id = $kat_delivery->GetJenisDeliveryByTemplate($template_id);
-
-			if($kat_del_id){
-				if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
-							
-					$attributes['distributor'] = 
-						$wpdb->get_results(
-							$wpdb->prepare(
-								"SELECT * FROM $this->table_name d
-								 WHERE kategori_delivery = %d",
-								 $kat_del_id
-							)
-						);
-				}
-			}
-		}
-
-		return $attributes;
-	}
-
 	/**
 	*
 	* Called by 

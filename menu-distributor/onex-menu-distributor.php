@@ -53,35 +53,19 @@ class Onex_Menu_Distributor{
 		return $attributes;
 	}
 
-	public function GetDistributorByTemplate($template_name){
+	public function GetMenuByKategori( $katmenu_id ){
 		global $wpdb;
 
-		$template = new Onex_Template();
-
-		$template_id = $template->GetTemplateIdByName($template_name);
-			
 		$attributes = null;
-
-		if($template_id){
-
-			$kat_delivery = new Onex_Jenis_Delivery();
-
-			$kat_del_id = $kat_delivery->GetJenisDeliveryByTemplate($template_id);
-
-			if($kat_del_id){
-				if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
-							
-					$attributes['distributor'] = 
-						$wpdb->get_results(
-							$wpdb->prepare(
-								"SELECT * FROM $this->table_name d
-								 WHERE kategori_delivery = %d",
-								 $kat_del_id
-							)
-						);
-				}
-			}
-		}
+		$attributes =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE katmenu_id = %d",
+					$katmenu_id
+					)
+				);
+		//var_dump($attributes);
 
 		return $attributes;
 	}
@@ -129,8 +113,8 @@ class Onex_Menu_Distributor{
 		return $result;
 	}
 
-	public function UpdateDistributor($id, $data){
-		global $wpdb;
+	public function UpdateMenuDistributor($id, $data){
+		/*global $wpdb;
 
 		$result = array(
 					'status' => false,
@@ -160,11 +144,11 @@ class Onex_Menu_Distributor{
 			$result['message'] = 'Tidak ada pembaharuan distributor.';
 		}
 
-		return $result;
+		return $result;*/
 	}
 
-	public function DeleteDistributor($id){
-		global $wpdb;
+	public function DeleteMenuDistributor($id){
+		/*global $wpdb;
 
 		if($wpdb->query(
 			$wpdb->prepare(
@@ -175,11 +159,11 @@ class Onex_Menu_Distributor{
 			return 'Berhasil menghapus Distributor.';
 		}else{
 			return 'Terjadi Kesalahan.';
-		}
+		}*/
 	}
 
-	public function GetDistributor($id){
-		global $wpdb;
+	public function GetMenuDistributor($id){
+		/*global $wpdb;
 
 		$row = 
 			$wpdb->get_row(
@@ -189,7 +173,7 @@ class Onex_Menu_Distributor{
 				), ARRAY_A
 			);
 		$attributes['distributor'] = $row;
-		return $attributes;
+		return $attributes;*/
 	}
 }
 

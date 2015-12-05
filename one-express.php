@@ -301,7 +301,7 @@ class Onex_Plugin{
 $onex_plugin_obj = new Onex_Plugin();
 
 
-function get_jenis_delivery(){
+/*function get_jenis_delivery(){
 	$delivery_obj = new Onex_Jenis_Delivery();
 	$content['katdel'] = $delivery_obj->DeliveryList();
 	return $content;
@@ -317,31 +317,24 @@ function get_distributor_by_template($template_name){
 	$distributor = new Onex_Distributor();
 	$content['distributor'] = $distributor->GetDistributorByTemplate($template_name);
 	return $content;
-}
+}*/
 
-function get_distributor_by_id(){
+/*function get_distributor_by_id(){
 	$onex_distributor_obj = new Onex_Distributor();
-	$content['distributor'] = $onex_distributor_obj->GetDistributor($_GET['distributor']);
-	return $content;
-}
+	$onex_kategori_menu_obj = new Onex_Kategori_Menu();
+	$content['distributor'] = $onex_distributor_obj->GetDistributor( $_GET['distributor']);
+	$content['katmenu'] = $onex_kategori_menu_obj->GetKategoriByDistributor( $_GET['distributor'] );
 
-function get_kategori_menu(){
+	return $content;
+}*/
+
+/*function get_kategori_menu(){
 	$katmenu_obj = new Onex_Kategori_Menu();
 	$content = $katmenu_obj->GetKategoriMenuList();
 	return $content;
-}
+}*/
 
 register_activation_hook( __FILE__, array('Onex_Plugin', 'plugin_activated'));
 
 define('ONEXPLUGINDIR', plugin_dir_path(__FILE__));
 require_once(ONEXPLUGINDIR . 'onex-main.php');
-// require_once(ONEXPLUGINDIR . 'distributor/onex-distributor.php');
-// require_once(ONEXPLUGINDIR . 'distributor/onex-distributor-tambah.php');
-// require_once(ONEXPLUGINDIR . 'distributor/onex-distributor-update.php');
-// require_once(ONEXPLUGINDIR . 'distributor/onex-distributor-hapus.php');
-//require_once(ONEXPLUGINDIR . 'jenis-delivery/onex-jenis-delivery.php');
-//require_once(ONEXPLUGINDIR . 'jenis-delivery/onex-jenis-delivery-tambah.php');
-//require_once(ONEXPLUGINDIR . 'jenis-delivery/onex-jenis-delivery-update.php');
-//require_once(ONEXPLUGINDIR . 'jenis-delivery/onex-jenis-delivery-hapus.php');
-// require_once(ONEXPLUGINDIR . 'bank/onex-bank.php');
-// require_once(ONEXPLUGINDIR . 'jenis-menu/onex-jenis-menu.php');
