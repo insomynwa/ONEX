@@ -5,11 +5,11 @@ include_once(WP_PLUGIN_DIR . '\one-express\jenis-delivery\onex-jenis-delivery.ph
 class Onex_Menu_Distributor{
 
 	private $table_name;
-	private $table_jenis_delivery;
+	private $table_kategori_menu;
 
 	function __construct(){
 		$this->table_name = "onex_menu_delivery";
-		$this->table_jenis_delivery = "onex_kategori_delivery";
+		$this->table_kategori_menu = "onex_kategori_menu";
 	}
 
 	public function GetMenuDistributorList(){
@@ -26,6 +26,29 @@ class Onex_Menu_Distributor{
 		}else{
 			$attributes = null;
 		}
+
+		return $attributes;
+	}
+
+	/**
+	*
+	* Called by 
+	* onex_distributor.php
+	*
+	*/
+	public function GetMenuByDistributorKategori( $distributor_id, $katmenu_id){
+		global $wpdb;
+
+		$attributes = null;
+		
+		$attributes = 
+			$wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT m.* FROM $this->table_name m
+						WHERE m.distributor_id = %d AND m.katmenu_id = %d",
+						$distributor_id, $katmenu_id
+					)
+				);
 
 		return $attributes;
 	}
@@ -63,7 +86,7 @@ class Onex_Menu_Distributor{
 		return $attributes;
 	}
 
-	public function AddKategoriMenu($data){
+	/*public function AddKategoriMenu($data){
 		global $wpdb;
 
 		if($wpdb->insert(
@@ -78,6 +101,32 @@ class Onex_Menu_Distributor{
 		}else{
 			return 'Terjadi Kesalahan.';
 		}
+	}*/
+
+	public function AddMenuDistributor( $data){
+		global $wpdb;
+
+		$result = array('status'=>false, 'message' =>'');
+
+		if( $wpdb->insert(
+				$this->table_name,
+				array(
+					'nama_menudel' => $data['menudist_nama'],
+					'harga_menudel' => $data['menudist_harga'],
+					'gambar_menudel' => $data['menudist_gambar'],
+					'keterangan_menudel' => $data['menudist_keterangan'],
+					'distributor_id' => $data['menudist_distributor'],
+					'katmenu_id' => $data['menudist_kategori']
+				),
+				array('%s','%d','%s','%s','%d','%d')
+			)
+		){
+			$result['status'] = true;
+			$result['message'] = "Berhasil menambah menu.";
+		}else{
+			$result['message'] = "Terjadi kesalahan.";
+		}
+		return $result;
 	}
 
 	public function UpdateDistributor($id, $data){

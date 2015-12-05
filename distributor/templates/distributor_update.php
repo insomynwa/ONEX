@@ -40,42 +40,42 @@
 	</div>
 	<?php endif; ?>
 	<div>
-		<img src="<?php if( $attributes['distributor']['gambar'] == 'NOIMAGE') echo bloginfo('template_url').'/images/no-image.jpg'; ?>" />
+		<img src="<?php if( $attributes['distributor']['gambar_dist'] == 'NOIMAGE') echo bloginfo('template_url').'/images/no-image.jpg'; ?>" />
 	</div>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
 		<p>Nama <strong>*</strong><br />
-			<input type="text" name="distributor-nama" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_nama; }else{ echo $attributes['distributor']['nama']; } ?>" />
+			<input type="text" name="distributor-nama" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_nama; }else{ echo $attributes['distributor']['nama_dist']; } ?>" />
 		</p>
 		<p>Gambar<br />
-			<input type="text" name="distributor-gambar-url" id="image_url" class="regular-text" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_gambar; }else{ echo $attributes['distributor']['gambar']; } ?>" >
+			<input type="text" name="distributor-gambar-url" id="image_url" class="regular-text" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_gambar; }else{ echo $attributes['distributor']['gambar_dist']; } ?>" >
     		<input type="button" name="distributor-gambar-button" id="upload-btn" class="button-secondary" value="Upload Image">
 		</p>
 		<p>Jenis Delivery<br />
 		<?php
-			$content = get_jenis_delivery();
+			//$content = get_jenis_delivery();
 			// var_dump($content['kat_del'][1]->id_kat_del);
-			if( ! is_null($content) ):
+			if( sizeof($attributes['katdel'])>0 ):
 		?>
 			<select name="distributor-jenis-delivery">
-				<?php for ($i=0; $i < sizeof($content['kat_del']); $i++ ): ?>
-				<option value="<?php echo $content['kat_del'][$i]->id_kat_del; ?>" <?php if( isset($result) ) { if( !$result['status'] && $dist_jenis_delivery==$content['kat_del'][$i]->id_kat_del ) echo "selected='selected'"; }else{ if( $attributes['distributor']['kategori_delivery']==$content['kat_del'][$i]->id_kat_del ) echo "selected='selected'";} ?> ><?php echo $content['kat_del'][$i]->kategori; ?></option>
-				<?php endfor; ?>
+				<?php foreach ( $attributes['katdel'] as $katdel ): ?>
+				<option value="<?php echo $katdel->id_katdel; ?>" <?php if( isset($result) ) { if( !$result['status'] && $dist_jenis_delivery==$katdel->id_katdel ) echo "selected='selected'"; }else{ if( $attributes['distributor']['katdel_id']==$katdel->id_katdel ) echo "selected='selected'";} ?> ><?php echo $katdel->nama_katdel; ?></option>
+				<?php endforeach; ?>
 			</select>
 		<?php else: ?>
 			<strong>Belum ada jenis delivery. <a href="">Buat sekarang</a>.</strong>
 		<?php endif; ?>
 		</p>
 		<p>Alamat <strong>*</strong><br />
-			<textarea name="distributor-alamat"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_alamat; }else{ echo $attributes['distributor']['alamat']; } ?></textarea>
+			<textarea name="distributor-alamat"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_alamat; }else{ echo $attributes['distributor']['alamat_dist']; } ?></textarea>
 		</p>
 		<p>No. Telp<br />
-			<input type="text" name="distributor-telp" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_telp; }else{ echo $attributes['distributor']['telp']; } ?>"/>
+			<input type="text" name="distributor-telp" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_telp; }else{ echo $attributes['distributor']['telp_dist']; } ?>"/>
 		</p>
 		<p>Email<br />
-			<input type="text" name="distributor-email" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_email; }else{ echo $attributes['distributor']['email']; } ?>" />
+			<input type="text" name="distributor-email" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_email; }else{ echo $attributes['distributor']['email_dist']; } ?>" />
 		</p>
 		<p>Keterangan<br />
-			<textarea name="distributor-keterangan"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_keterangan; }else{ echo $attributes['distributor']['keterangan']; } ?></textarea>
+			<textarea name="distributor-keterangan"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_keterangan; }else{ echo $attributes['distributor']['keterangan_dist']; } ?></textarea>
 		</p>
 		<p>
 			<input type="submit" name="distributor-update-submit" value="Simpan" />

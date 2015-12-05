@@ -17,16 +17,16 @@ class Onex_Jenis_Delivery{
 	}
 
 	function AjaxLoad_JenisDelivery_List(){
-		$attributes = $this->DeliveryList();
+		$attributes['katdel'] = $this->DeliveryList();
 		echo $this->getHtmlTemplate( 'templates/', 'delivery_list', $attributes );
 		wp_die();
 	}
 
 	function AjaxLoad_JenisDelivery_Detail(){
-		if( isset( $_GET['katdel']) ){
-			$attributes = $this->GetDelivery( $_GET['katdel'] );
+		if( isset( $_GET['kategori_delivery']) ){
+			$attributes['katdel'] = $this->GetDelivery( $_GET['kategori_delivery'] );
 			$onex_distributor_obj = new Onex_Distributor();
-			$attributes['katdel_rel'] = $onex_distributor_obj->GetDistributorByJenisDelivery( $_GET['katdel']);
+			$attributes['katdel_rel']['distributor'] = $onex_distributor_obj->GetDistributorByJenisDelivery( $_GET['kategori_delivery']);
 
 			echo $this->getHtmlTemplate( 'templates/', 'delivery_detail', $attributes );
 		}
@@ -36,17 +36,14 @@ class Onex_Jenis_Delivery{
 	public function DeliveryList(){
 		global $wpdb;
 		//$table_name = "onex_kategori_delivery";
+		$attributes = null;
 
-		if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
-			$attributes['kat_del'] = 
-				$wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT id_kat_del, kategori, keterangan FROM $this->table_name", null
-					)
-				);
-		}else{
-			$attributes = null;
-		}
+		$attributes = 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name", null
+				)
+			);
 
 		return $attributes;
 		//return $this->getHtmlTemplate('delivery_list', $attributes);
@@ -64,7 +61,7 @@ class Onex_Jenis_Delivery{
 			);
 
 		if( !is_null($row) && !empty($row))
-			return $row['id_kat_del'];
+			return $row['id_katdel'];
 
 		return 0;
 	}
@@ -75,8 +72,8 @@ class Onex_Jenis_Delivery{
 		if($wpdb->insert(
 			$this->table_name,
 			array(
-				'kategori' => $data['katdel_nama'],
-				'keterangan' => $data['katdel_keterangan']
+				'nama_katdel' => $data['katdel_nama'],
+				'keterangan_katdel' => $data['katdel_keterangan']
 			),
 			array('%s','%s')
 		)){
@@ -93,11 +90,11 @@ class Onex_Jenis_Delivery{
 		$row = 
 			$wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM $this->table_name WHERE id_kat_del = %d",
+					"SELECT * FROM $this->table_name WHERE id_katdel = %d",
 					$id
 				), ARRAY_A
 			);
-		$attributes['katdel'] = $row;
+		$attributes = $row;
 		return $attributes;
 	}
 
@@ -106,7 +103,7 @@ class Onex_Jenis_Delivery{
 
 		if($wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM $this->table_name WHERE id_kat_del = %d",
+				"DELETE FROM $this->table_name WHERE id_katdel = %d",
 				$id
 			)
 		)){
@@ -122,10 +119,10 @@ class Onex_Jenis_Delivery{
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'kategori' => $data['katdel_nama'],
-				'keterangan' => $data['katdel_keterangan']
+				'nama_katdel' => $data['katdel_nama'],
+				'keterangan_katdel' => $data['katdel_keterangan']
 			),
-			array('id_kat_del' => $data['katdel_id']),
+			array('id_katdel' => $data['katdel_id']),
 			array('%s','%s'),
 			array('%d')
 		)){

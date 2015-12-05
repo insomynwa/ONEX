@@ -35,7 +35,7 @@ class Onex_Plugin{
 		* INSERT DATA
 		*
 		*/
-		global $wpdb;
+		/*global $wpdb;
 		$onex_katdel_table_name = "onex_kategori_delivery";
 
 		if($wpdb->get_var("SHOW TABLES LIKE '$onex_katdel_table_name'") == $onex_katdel_table_name){
@@ -43,15 +43,15 @@ class Onex_Plugin{
 				$wpdb->insert(
 					$onex_katdel_table_name,
 					array(
-						"kategori" => "Food Delivery",
-						"keterangan" => "delivery khusus antar makanan dari restaurant ke pelanggan"
+						"nama_katdel" => "Food Delivery",
+						"keterangan_katdel" => "delivery khusus antar makanan dari restaurant ke pelanggan"
 					),
 					array('%s', '%s')
 				);
 			}
-		}
+		}*/
 
-		$onex_katmenumakmin_table_name = "onex_kategori_menu_makmin";
+		/*$onex_katmenumakmin_table_name = "onex_kategori_menu_makmin";
 		if( $wpdb->get_var("SHOW TABLES LIKE '$onex_katmenumakmin_table_name'") == $onex_katmenumakmin_table_name ){
 			if($wpdb->get_var("SELECT COUNT(*) FROM $onex_katmenumakmin_table_name") < 1){
 				$wpdb->insert(
@@ -62,7 +62,7 @@ class Onex_Plugin{
 					array('%s')
 				);
 			}
-		}
+		}*/
 	}
 
 	function load_wp_media_files(){
@@ -97,7 +97,7 @@ class Onex_Plugin{
 			'Tambah Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-tambah',
-			array( $this, 'render_delivery_tambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderDeliveryTambah')//'onex_jenis_delivery_tambah'
 		);
 		add_submenu_page(
 			null,
@@ -105,7 +105,7 @@ class Onex_Plugin{
 			'Hapus Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-hapus',
-			array( $this, 'render_delivery_hapus')//'onex_jenis_delivery_hapus'
+			array( $this, 'RenderDeliveryHapus')//'onex_jenis_delivery_hapus'
 		);
 		add_submenu_page(
 			null,
@@ -113,7 +113,7 @@ class Onex_Plugin{
 			'Update Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-update',
-			array( $this, 'render_delivery_update')//'onex_jenis_delivery_update'
+			array( $this, 'RenderDeliveryUpdate')//'onex_jenis_delivery_update'
 		);
 
 		// Sub MENU "DISTRIBUTOR" ************
@@ -170,7 +170,7 @@ class Onex_Plugin{
 
 		// Sub MENU "MENU DISTRIBUTOR"
 		add_submenu_page(
-			'onex-main-page',
+			null,
 			'Menu Distributor',
 			'Menu Distributor',
 			'manage_options',
@@ -214,19 +214,19 @@ class Onex_Plugin{
 		return $this->getHtmlTemplate( 'jenis-delivery/templates/', 'delivery_main', $attributes);
 	}
 
-	function render_delivery_tambah(){
+	function RenderDeliveryTambah(){
 		return $this->getHtmlTemplate( 'jenis-delivery/templates/', 'delivery_tambah', $attributes);
 	}
 
-	function render_delivery_hapus(){
+	function RenderDeliveryHapus(){
 		//var_dump($_GET['id']);
-		$attributes = $this->onex_jenis_delivery_obj->GetDelivery($_GET['id']);
+		$attributes['katdel'] = $this->onex_jenis_delivery_obj->GetDelivery($_GET['id']);
 
 		return $this->getHtmlTemplate( 'jenis-delivery/templates/', 'delivery_hapus', $attributes);
 	}
 
-	function render_delivery_update(){
-		$attributes = $this->onex_jenis_delivery_obj->GetDelivery($_GET['id']);
+	function RenderDeliveryUpdate(){
+		$attributes['katdel'] = $this->onex_jenis_delivery_obj->GetDelivery($_GET['id']);
 
 		return $this->getHtmlTemplate( 'jenis-delivery/templates/', 'delivery_update', $attributes);
 	}
@@ -248,18 +248,27 @@ class Onex_Plugin{
 	}
 
 	function RenderDistributorUpdate(){
-		$attributes = $this->onex_distributor_obj->GetDistributor($_GET['id']);
+		$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor($_GET['id']);
+		$attributes['katdel'] = $this->onex_jenis_delivery_obj->DeliveryList();
 
 		return $this->getHtmlTemplate( 'distributor/templates/', 'distributor_update', $attributes);
 	}
 
 	function RenderKategoriMenuList(){
-		$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
+		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
-		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_list', $attributes);
+		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_main', $attributes);
 	}
 
 	function RenderKategoriMenuTambah(){
+		if( isset( $_GET['distributor'])){
+			$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $_GET['distributor']);
+			$attributes['single'] = true;
+		}else{
+			$attributes['distributor'] = $this->onex_distributor_obj->GetDistributorAll();
+			$attributes['single'] = false;
+		}
+
 		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_tambah', $attributes);
 	}
 
@@ -270,6 +279,11 @@ class Onex_Plugin{
 	}
 
 	function RenderMenuDistributorTambah(){
+		if(isset($_GET['distributor']) && isset($_GET['kategori'])){
+			$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $_GET['distributor']);
+			$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $_GET['kategori']);
+		}
+
 		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_tambah', $attributes);
 	}
 
@@ -289,7 +303,7 @@ $onex_plugin_obj = new Onex_Plugin();
 
 function get_jenis_delivery(){
 	$delivery_obj = new Onex_Jenis_Delivery();
-	$content = $delivery_obj->DeliveryList();
+	$content['katdel'] = $delivery_obj->DeliveryList();
 	return $content;
 }
 
@@ -301,13 +315,13 @@ function get_distributor(){
 
 function get_distributor_by_template($template_name){
 	$distributor = new Onex_Distributor();
-	$content = $distributor->GetDistributorByTemplate($template_name);
+	$content['distributor'] = $distributor->GetDistributorByTemplate($template_name);
 	return $content;
 }
 
 function get_distributor_by_id(){
 	$onex_distributor_obj = new Onex_Distributor();
-	$content = $onex_distributor_obj->GetDistributor($_GET['distributor']);
+	$content['distributor'] = $onex_distributor_obj->GetDistributor($_GET['distributor']);
 	return $content;
 }
 

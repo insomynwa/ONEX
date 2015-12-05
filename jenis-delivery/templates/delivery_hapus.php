@@ -14,7 +14,7 @@
 	<?php if($_POST['katdel-hapus-submit']) { ?>
 		<div class="updated"><?php echo $message; ?></div>
 	<?php } else { ?>
-		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['kat_del']['kategori']; ?></strong>?</p>
+		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['katdel']['nama_katdel']; ?></strong>?</p>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<p>
 				<input type="submit" name="katdel-hapus-submit" value="Ya" />

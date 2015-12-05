@@ -17,9 +17,9 @@
 		<?php foreach($attributes['distributor'] as $distributor ): ?>
 			<tr>
 				<td><?php echo $nmr; ?></td>
-				<td><?php echo $distributor->nama; ?></td>
+				<td><?php echo $distributor->nama_dist; ?></td>
 				<!-- <td><img src="<?php //if( $distributor->gambar == 'NOIMAGE'){ echo bloginfo('template_url').'/images/no-image.jpg';} else{ echo $distributor->gambar;} ?>" /></td> -->
-				<td><?php echo $distributor->kategori; ?></td>
+				<td><?php echo $distributor->nama_katdel; ?></td>
 				<td><a id="dist-id_<?php echo $distributor->id_dist; ?>" class="distributor-detail-link" href="#">Detail</a></td>
 				<td>
 					<a href='<?php echo admin_url('admin.php?page=onex-distributor-hapus&id='. $distributor->id_dist); ?>'>Hapus</a> | 

@@ -7,7 +7,7 @@
 
 	if(isset($_POST['katdel-update-submit'])){
 
-		if($katdel_nama == $attributes['kat_del']['kategori'] && $katdel_keterangan == $attributes['kat_del']['keterangan'] && $katdel_id == $attributes['kat_del']['id_kat_del']){
+		if($katdel_nama == $attributes['katdel']['nama_katdel'] && $katdel_keterangan == $attributes['katdel']['keterangan_katdel'] && $katdel_id == $attributes['katdel']['id_katdel']){
 			$success = true;
 			$message = "Tidak ada pembaharuan yang dilakukan.";
 		}else{
@@ -45,7 +45,7 @@
 				if($_POST['katdel-update-submit'] && !$success )
 					echo $katdel_nama;
 				else
-					echo $attributes['kat_del']['kategori']; 
+					echo $attributes['katdel']['nama_katdel']; 
 			?>"
 			/>
 		</p>
@@ -54,7 +54,7 @@
 					if($_POST['katdel-update-submit'] && !$success )
 						echo $katdel_keterangan;
 					else
-						echo $attributes['kat_del']['keterangan']; 
+						echo $attributes['katdel']['keterangan_katdel']; 
 				?>
 			</textarea>
 		</p>

@@ -55,8 +55,8 @@
 			if( ! is_null($content) ):
 		?>
 			<select name="distributor-jenis-delivery">
-				<?php for ($i=0; $i < sizeof($content['kat_del']); $i++ ): ?>
-				<option value="<?php echo $content['kat_del'][$i]->id_kat_del; ?>" <?php if(isset($result) && !$result['status'] && $dist_jenis_delivery==$content['kat_del'][$i]->id_kat_del ) echo "selected='selected'"; ?> ><?php echo $content['kat_del'][$i]->kategori; ?></option>
+				<?php for ($i=0; $i < sizeof($content['katdel']); $i++ ): ?>
+				<option value="<?php echo $content['katdel'][$i]->id_katdel; ?>" <?php if(isset($result) && !$result['status'] && $dist_jenis_delivery==$content['kat_del'][$i]->id_katdel ) echo "selected='selected'"; ?> ><?php echo $content['katdel'][$i]->nama_katdel; ?></option>
 				<?php endfor; ?>
 			</select>
 		<?php else: ?>

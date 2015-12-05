@@ -2,6 +2,8 @@
 
 include_once(WP_PLUGIN_DIR . '\one-express\template-set\onex_template.php');
 include_once(WP_PLUGIN_DIR . '\one-express\jenis-delivery\onex-jenis-delivery.php');
+include_once(WP_PLUGIN_DIR . '\one-express\kategori-menu\onex-kategori-menu.php');
+include_once(WP_PLUGIN_DIR . '\one-express\menu-distributor\onex-menu-distributor.php');
 class Onex_Distributor{
 
 	private $table_name;
@@ -10,6 +12,7 @@ class Onex_Distributor{
 	function __construct(){
 		$this->table_name = "onex_distributor";
 		$this->table_jenis_delivery = "onex_kategori_delivery";
+
 
 		add_action('wp_print_scripts', array( $this, 'AjaxDistributorLoadScripts')) ;
 		add_action('wp_ajax_AjaxGetDistributorList', array( $this, 'AjaxLoad_Distributor_List')) ;
@@ -25,7 +28,7 @@ class Onex_Distributor{
 	}
 
 	function AjaxLoad_Distributor_List(){
-		$attributes = $this->DistributorList();
+		$attributes['distributor'] = $this->DistributorList();
 		echo $this->getHtmlTemplate(  'templates/', 'distributor_list', $attributes);
 		wp_die();
 	}
@@ -36,7 +39,16 @@ class Onex_Distributor{
 			// now set our response var equal to that of the POST var (this will need to be sanitized based on what you're doing with with it)
 			//$response = $_GET["distributor"];
 			// send the response back to the front end
-			$attributes = $this->GetDistributor($_GET["distributor"]);
+			$attributes['distributor'] = $this->GetDistributor( $_GET["distributor"]);
+
+			$onex_kategori_menu_obj = new Onex_Kategori_Menu();
+			$attributes['distributor_rel']['katmenu'] = $onex_kategori_menu_obj->GetKategoriByDistributor( $_GET['distributor']);
+
+			$onex_menu_distributor_obj = new Onex_Menu_Distributor();
+			foreach( $attributes['distributor_rel']['katmenu'] as $diskat => $value ){
+				$attributes['distributor_rel']['menudist'][$value->nama_katmenu] = $onex_menu_distributor_obj->GetMenuByDistributorKategori( $_GET['distributor'], $value->id_katmenu );
+			}
+			//var_dump($attributes['distributor_rel']['menudist']);
 			
 			echo $this->getHtmlTemplate(  'templates/', 'distributor_detail', $attributes);
 			wp_die();
@@ -46,19 +58,33 @@ class Onex_Distributor{
 	public function DistributorList(){
 		global $wpdb;
 
-		if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
-			
-			$attributes['distributor'] = $wpdb->get_results(
-						$wpdb->prepare(
-							"SELECT d.*, kd.kategori FROM $this->table_name d
-							 LEFT JOIN $this->table_jenis_delivery kd
-							 ON d.kategori_delivery=kd.id_kat_del
-							",null
-						)
-					);
-		}else{
-			$attributes = null;
-		}
+		$attributes = null;
+		
+		$attributes = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT d.*, kd.nama_katdel FROM $this->table_name d
+						 LEFT JOIN $this->table_jenis_delivery kd
+						 ON d.katdel_id=kd.id_katdel
+						 ORDER BY d.nama_dist ASC"
+						 ,null
+					)
+				);
+
+		return $attributes;
+	}
+
+	public function GetDistributorAll(){
+		global $wpdb;
+
+		$attributes = null;
+
+		$attributes =
+			$wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT * FROM $this->table_name ORDER BY nama_dist ASC",
+						null
+					)
+				);
 
 		return $attributes;
 	}
@@ -81,11 +107,11 @@ class Onex_Distributor{
 			if($kat_del_id){
 				if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
 							
-					$attributes['distributor'] = 
+					$attributes = 
 						$wpdb->get_results(
 							$wpdb->prepare(
 								"SELECT * FROM $this->table_name d
-								 WHERE kategori_delivery = %d",
+								 WHERE katdel_id = %d",
 								 $kat_del_id
 							)
 						);
@@ -101,17 +127,15 @@ class Onex_Distributor{
 
 		$attributes = null;
 
-		if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
+		$attributes = 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE katdel_id = %d",
+					$id
+				)
+			);
 
-			$attributes['distributor'] = 
-				$wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT * FROM $this->table_name
-						WHERE kategori_delivery = %d",
-						$id
-					)
-				);
-		}
 		return $attributes;
 	}
 
@@ -126,13 +150,13 @@ class Onex_Distributor{
 		if($wpdb->insert(
 			$this->table_name,
 			array(
-				'nama' => $data['dist_nama'],
-				'alamat' => $data['dist_alamat'],
-				'kategori_delivery' => $data['dist_jenis_delivery'],
-				'telp' => $data['dist_telp'],
-				'email' => $data['dist_email'],
-				'keterangan' => $data['dist_keterangan'],
-				'gambar' => $data['dist_gambar']
+				'nama_dist' => $data['dist_nama'],
+				'alamat_dist' => $data['dist_alamat'],
+				'katdel_id' => $data['dist_jenis_delivery'],
+				'telp_dist' => $data['dist_telp'],
+				'email_dist' => $data['dist_email'],
+				'keterangan_dist' => $data['dist_keterangan'],
+				'gambar_dist' => $data['dist_gambar']
 			),
 			array('%s','%s','%d','%s','%s','%s', '%s')
 		)){
@@ -157,13 +181,13 @@ class Onex_Distributor{
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'nama' => $data['dist_nama'],
-				'alamat' => $data['dist_alamat'],
-				'kategori_delivery' => $data['dist_jenis_delivery'],
-				'telp' => $data['dist_telp'],
-				'email' => $data['dist_email'],
-				'keterangan' => $data['dist_keterangan'],
-				'gambar' => $data['dist_gambar']
+				'nama_dist' => $data['dist_nama'],
+				'alamat_dist' => $data['dist_alamat'],
+				'katdel_id' => $data['dist_jenis_delivery'],
+				'telp_dist' => $data['dist_telp'],
+				'email_dist' => $data['dist_email'],
+				'keterangan_dist' => $data['dist_keterangan'],
+				'gambar_dist' => $data['dist_gambar']
 			),
 			array('id_dist' => $id),
 			array('%s','%s'),
@@ -204,7 +228,7 @@ class Onex_Distributor{
 					$id
 				), ARRAY_A
 			);
-		$attributes['distributor'] = $row;
+		$attributes = $row;
 		return $attributes;
 	}
 
