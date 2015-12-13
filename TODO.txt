@@ -1,0 +1,10 @@
+pagination menu
+checkout
+lokasi
+payment
+tax
+bank
+promo
+message
+kode invoice
+invoice

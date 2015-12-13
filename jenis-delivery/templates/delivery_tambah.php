@@ -24,7 +24,7 @@
 	<div class="updated"><p><?php echo $message; ?></p></div>
 	<?php endif; ?>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-		<p>Nama<br />
+		<p>Nama <strong>*</strong><br />
 			<input type="text" name="katdel-nama" />
 		</p>
 		<p>Keterangan<br />

@@ -15,8 +15,8 @@ if( sizeof($attributes['katmenu']) > 0 ): ?>
 					<td><?php echo $katmenu->nama_katmenu; ?></td>
 					<td><?php echo $katmenu->nama_dist; ?></td>
 					<td>
-						<a href='<?php echo admin_url('admin.php?page=onex-distributor-hapus&id='. $distributor->id_dist); ?>'>Hapus</a> | 
-						<a href='<?php echo admin_url('admin.php?page=onex-distributor-update&id='. $distributor->id_dist); ?>'>Update</a>
+						<a href='<?php echo admin_url('admin.php?page=onex-kategori-menu-hapus&id='. $katmenu->id_katmenu); ?>'>Hapus</a> | 
+						<a href='<?php echo admin_url('admin.php?page=onex-kategori-menu-update&id='. $katmenu->id_katmenu); ?>'>Update</a>
 					</td>
 				</tr>
 				<?php $nmr += 1; ?>

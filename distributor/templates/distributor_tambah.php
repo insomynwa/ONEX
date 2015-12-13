@@ -13,8 +13,9 @@
 		$dist_keterangan = sanitize_text_field($_POST['distributor-keterangan']);
 		$dist_jenis_delivery = sanitize_text_field($_POST['distributor-jenis-delivery']);
 		$dist_gambar = sanitize_text_field($_POST['distributor-gambar-url']);
+		$dist_kode = sanitize_text_field($_POST['distributor-kode']);
 
-		if( $dist_nama != "" && $dist_alamat != "" && !is_null($dist_jenis_delivery) ){
+		if( $dist_nama != "" && $dist_alamat != "" && !is_null($dist_jenis_delivery) && $dist_kode!="" ){
 			$data = array(
 					'dist_nama' => $dist_nama,
 					'dist_alamat' => $dist_alamat,
@@ -22,7 +23,8 @@
 					'dist_email' => $dist_email,
 					'dist_keterangan' => $dist_keterangan,
 					'dist_jenis_delivery' => $dist_jenis_delivery,
-					'dist_gambar' => $dist_gambar
+					'dist_gambar' => $dist_gambar,
+					'dist_kode' => $dist_kode
 				);
 			if( $dist_gambar!='' ) $data['dist_gambar'] = $dist_gambar;
 
@@ -74,6 +76,9 @@
 		</p>
 		<p>Keterangan<br />
 			<textarea name="distributor-keterangan"></textarea>
+		</p>
+		<p>Kode Invoice <strong>*</strong><br />
+			<input type="text" name="distributor-kode" placeholder="kode untuk nomor invoice" />
 		</p>
 		<p>
 			<input type="submit" name="distributor-tambah-submit" value="Tambah" />

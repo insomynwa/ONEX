@@ -49,6 +49,26 @@ class Onex_Kategori_Menu{
 		return $attributes;
 	}
 
+	public function GetKategoriMenuDistributorById( $katmenu_id){
+		global $wpdb;
+
+		$attributes = null;
+
+		$attributes = 
+			$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT km.*, d.nama_dist FROM $this->table_name km
+						LEFT JOIN $this->table_distributor d
+						ON km.distributor_id=d.id_dist
+						WHERE km.id_katmenu=%d",
+						$katmenu_id
+					),
+					ARRAY_A
+				);
+
+		return $attributes;
+	}
+
 	/**
 	*
 	* Called by 
@@ -91,38 +111,32 @@ class Onex_Kategori_Menu{
 		}
 	}
 
-	public function UpdateDistributor($id, $data){
-		/*global $wpdb;
+	public function UpdateKategoriMenu($id, $data){
+		global $wpdb;
 
 		$result = array(
 					'status' => false,
 					'message' => ''
 				);
-		if ($data['dist_gambar'] == '' ) $data['dist_gambar'] = 'NOIMAGE';
 
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'nama' => $data['dist_nama'],
-				'alamat' => $data['dist_alamat'],
-				'kategori_delivery' => $data['dist_jenis_delivery'],
-				'telp' => $data['dist_telp'],
-				'email' => $data['dist_email'],
-				'keterangan' => $data['dist_keterangan'],
-				'gambar' => $data['dist_gambar']
+				'nama_katmenu' => $data['katmenu_nama'],
+				'keterangan_katmenu' => $data['katmenu_keterangan']
 			),
-			array('id_dist' => $id),
+			array('id_katmenu' => $id),
 			array('%s','%s'),
 			array('%d')
 		)){
 			$result['status'] = true;
-			$result['message'] = 'Distributor berhasil diperbaharui.';
+			$result['message'] = 'Berhasil.';
 		}else{
 			$result['status'] = true;
 			$result['message'] = 'Tidak ada pembaharuan distributor.';
 		}
 
-		return $result;*/
+		return $result;
 	}
 
 	public function DeleteDistributor($id){

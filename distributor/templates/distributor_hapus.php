@@ -14,7 +14,7 @@
 	<?php if($_POST['dist_hapus_submit']) { ?>
 		<div class="updated"><?php echo $message; ?></div>
 	<?php } else { ?>
-		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['distributor']['nama']; ?></strong>?</p>
+		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['distributor']['nama_dist']; ?></strong>?</p>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<p>
 				<input type="submit" name="dist_hapus_submit" value="Ya" />

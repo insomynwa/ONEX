@@ -12,8 +12,9 @@
 		$dist_keterangan = sanitize_text_field($_POST['distributor-keterangan']);
 		$dist_jenis_delivery = sanitize_text_field($_POST['distributor-jenis-delivery']);
 		$dist_gambar = sanitize_text_field($_POST['distributor-gambar-url']);
+		$dist_kode = sanitize_text_field($_POST['distributor-kode']);
 
-		if( $dist_nama != "" && $dist_alamat != "" && !is_null($dist_jenis_delivery) ){
+		if( $dist_nama != "" && $dist_alamat != "" && !is_null($dist_jenis_delivery) && $dist_kode!="" ){
 			$data = array(
 					'dist_nama' => $dist_nama,
 					'dist_alamat' => $dist_alamat,
@@ -21,7 +22,8 @@
 					'dist_email' => $dist_email,
 					'dist_keterangan' => $dist_keterangan,
 					'dist_jenis_delivery' => $dist_jenis_delivery,
-					'dist_gambar' => $dist_gambar
+					'dist_gambar' => $dist_gambar,
+					'dist_kode' => $dist_kode
 				);
 			if( $dist_gambar!='' ) $data['dist_gambar'] = $dist_gambar;
 
@@ -38,9 +40,9 @@
 	<div class="updated">
 		<p><?php echo $result['message']; ?></p>
 	</div>
-	<?php endif; ?>
+	<?php else: ?>
 	<div>
-		<img src="<?php if( $attributes['distributor']['gambar_dist'] == 'NOIMAGE') echo bloginfo('template_url').'/images/no-image.jpg'; ?>" />
+		<img src="<?php if( !$result['status'] ) echo $attributes['distributor']['gambar_dist']; ?>" />
 	</div>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
 		<p>Nama <strong>*</strong><br />
@@ -77,10 +79,14 @@
 		<p>Keterangan<br />
 			<textarea name="distributor-keterangan"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_keterangan; }else{ echo $attributes['distributor']['keterangan_dist']; } ?></textarea>
 		</p>
+		<p>Kode Invoice <strong>*</strong><br />
+			<input type="text" name="distributor-kode" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_kode; }else{ echo $attributes['distributor']['kode_dist']; } ?>"/>
+		</p>
 		<p>
 			<input type="submit" name="distributor-update-submit" value="Simpan" />
 		</p>
 	</form>
+	<?php endif; ?>
 	<a href="<?php echo admin_url('admin.php?page=onex-distributor-page'); ?>">kembali ke Daftar Distributor</a>
 </div>
 <script type="text/javascript">

@@ -7,11 +7,13 @@
 
 	if(isset($_POST['katdel-update-submit'])){
 
-		if($katdel_nama == $attributes['katdel']['nama_katdel'] && $katdel_keterangan == $attributes['katdel']['keterangan_katdel'] && $katdel_id == $attributes['katdel']['id_katdel']){
+		if($katdel_nama == $attributes['katdel']['nama_katdel'] && 
+		$katdel_keterangan == $attributes['katdel']['keterangan_katdel'] && 
+		$katdel_id == $attributes['katdel']['id_katdel']){
 			$success = true;
 			$message = "Tidak ada pembaharuan yang dilakukan.";
 		}else{
-			if(!is_null($katdel_nama) && ! empty($katdel_nama) && $katdel_nama!="" ){
+			if(!is_null($katdel_nama) && ! empty($katdel_nama) && $katdel_nama!=""){
 				$onex_jenis_delivery_obj = new Onex_Jenis_Delivery();
 				if($katdel_keterangan=="") $katdel_keterangan = $katdel_nama;
 				$data = array(
@@ -40,7 +42,7 @@
 	</div>
 	<?php endif; ?>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-		<p>Nama<br />
+		<p>Nama <strong>*</strong><br />
 			<input type="text" name="katdel-nama" value="<?php 
 				if($_POST['katdel-update-submit'] && !$success )
 					echo $katdel_nama;
@@ -58,8 +60,17 @@
 				?>
 			</textarea>
 		</p>
+		<!-- <p>Kode<br />
+			<input type="text" name="katdel-kode" value="<?php 
+				//if($_POST['katdel-update-submit'] && !$success )
+				//	echo $katdel_kode;
+				//else
+				//	echo $attributes['katdel']['kode_katdel']; 
+			?>"
+			/>
+		</p> -->
 		<p>
-			<input type="submit" name="katdel-update-submit" value="Update" />
+			<input type="submit" name="katdel-update-submit" value="Simpan" />
 		</p>
 	</form>
 <?php } ?>

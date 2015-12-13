@@ -26,7 +26,7 @@
 	<div class="updated"><p><?php echo $message; ?></p></div>
 	<?php endif; ?>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-		<p>Nama<br />
+		<p>Nama <strong>*</strong><br />
 			<input type="text" name="katmenu-nama" />
 		</p>
 		<p>Distributor<br />
@@ -42,7 +42,7 @@
 			<?php endif; ?>
 		<?php else: ?>
 			<?php echo $attributes['distributor']['nama_dist']; ?>
-			<input type="hidden" name="katmenu-distributor" value="<?php echo $attributes['distributor']['id_dist']; ?>" ?>
+			<input type="hidden" name="katmenu-distributor" value="<?php echo $attributes['distributor']['id_dist']; ?>" />
 		<?php endif; ?>
 		</p>
 		<p>Keterangan<br />

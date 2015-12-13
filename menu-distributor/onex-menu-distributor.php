@@ -162,6 +162,21 @@ class Onex_Menu_Distributor{
 		}*/
 	}
 
+	public function GetHargaMenuDistributor($menudel_id){
+		global $wpdb;
+
+		$row =
+		$wpdb->get_row(
+			$wpdb->prepare(
+					"SELECT harga_menudel FROM $this->table_name 
+					WHERE id_menudel = %d",
+					$menudel_id
+				),
+				ARRAY_A
+			);
+		return $row['harga_menudel'];
+	}
+
 	public function GetMenuDistributor($id){
 		/*global $wpdb;
 

@@ -156,9 +156,10 @@ class Onex_Distributor{
 				'telp_dist' => $data['dist_telp'],
 				'email_dist' => $data['dist_email'],
 				'keterangan_dist' => $data['dist_keterangan'],
-				'gambar_dist' => $data['dist_gambar']
+				'gambar_dist' => $data['dist_gambar'],
+				'kode_dist' => $data['dist_kode']
 			),
-			array('%s','%s','%d','%s','%s','%s', '%s')
+			array('%s','%s','%d','%s','%s','%s', '%s', '%s')
 		)){
 			$result['status'] = true;
 			$result['message'] = 'Berhasil menambah distributor.';
@@ -187,10 +188,11 @@ class Onex_Distributor{
 				'telp_dist' => $data['dist_telp'],
 				'email_dist' => $data['dist_email'],
 				'keterangan_dist' => $data['dist_keterangan'],
-				'gambar_dist' => $data['dist_gambar']
+				'gambar_dist' => $data['dist_gambar'],
+				'kode_dist' => $data['dist_kode']
 			),
 			array('id_dist' => $id),
-			array('%s','%s'),
+			array('%s','%s','%d','%s','%s','%s', '%s', '%s'),
 			array('%d')
 		)){
 			$result['status'] = true;

@@ -30,7 +30,7 @@
 </p>
 	<?php endforeach; ?>
 <?php else: ?>
-	<?php echo "Belum ada kategori."; ?>
+	<?php echo "Belum ada kategori. "; ?><a href='<?php echo admin_url("admin.php?page=onex-kategori-menu-tambah&distributor={$attributes['distributor']['id_dist']}"); ?>'>Tambah</a>?
 <?php endif; ?>
 <!-- <p>Menu
 	<?php //$nmr=1; if( !is_null($attributes['distributor_rel']['menudist']) && sizeof($attributes['distributor_rel']['menudist'])>0 ): ?>

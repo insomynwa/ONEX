@@ -8,18 +8,29 @@ include_once('jenis-delivery/onex-jenis-delivery.php');
 include_once('distributor/onex-distributor.php');
 include_once('kategori-menu/onex-kategori-menu.php');
 include_once('menu-distributor/onex-menu-distributor.php');
+include_once('lokasi/onex-lokasi.php');
+include_once('bank/onex-bank.php');
+include_once('promo/onex-promo.php');
+include_once('invoice/onex-invoice.php');
+include_once('pemesanan-menu/onex-pemesanan-menu.php');
 class Onex_Plugin{
 
 	private $onex_jenis_delivery_obj;
 	private $onex_distributor_obj;
 	private $onex_kategori_menu_obj;
 	private $onex_menu_distributor_obj;
+	private $onex_lokasi_obj;
+	private $onex_bank_obj;
+	private $onex_promo_obj;
 
 	public function __construct(){
 		$this->onex_jenis_delivery_obj = new Onex_Jenis_Delivery();
 		$this->onex_distributor_obj = new Onex_Distributor();
 		$this->onex_kategori_menu_obj = new Onex_Kategori_Menu();
 		$this->onex_menu_distributor_obj = new Onex_Menu_Distributor();
+		$this->onex_lokasi_obj = new Onex_Lokasi();
+		$this->onex_bank_obj = new Onex_Bank();
+		$this->onex_promo_obj = new Onex_Promo();
 
 		add_action('admin_menu', array( $this, 'create_menu') );
 		add_action('admin_enqueue_scripts', array( $this, 'load_wp_media_files'));
@@ -167,16 +178,24 @@ class Onex_Plugin{
 			'onex-kategori-menu-tambah',
 			array( $this, 'RenderKategoriMenuTambah')//'onex_jenis_delivery_tambah'
 		);
+		add_submenu_page(
+			null,
+			'Update Kategori Menu',
+			'Update Kategori Menu',
+			'manage_options',
+			'onex-kategori-menu-update',
+			array( $this, 'RenderKategoriMenuUpdate')//'onex_jenis_delivery_tambah'
+		);
 
 		// Sub MENU "MENU DISTRIBUTOR"
-		add_submenu_page(
+		/*add_submenu_page(
 			null,
 			'Menu Distributor',
 			'Menu Distributor',
 			'manage_options',
 			'onex-menu-distributor-page',
 			array( $this, 'RenderMenuDistributorList')
-		);
+		);*/
 		add_submenu_page(
 			null,
 			'Tambah Menu Distributor',
@@ -186,25 +205,51 @@ class Onex_Plugin{
 			array( $this, 'RenderMenuDistributorTambah')//'onex_jenis_delivery_tambah'
 		);
 
-		// Sub MENU "BANK" **********************
+		// Sub MENU "LOKASI"
+		add_submenu_page(
+			'onex-main-page',
+			'Lokasi',
+			'Lokasi',
+			'manage_options',
+			'onex-lokasi-page',
+			array( $this, 'RenderLokasiList')
+		);
 		/*add_submenu_page(
+			null,
+			'Tambah Menu Distributor',
+			'Tambah Menu Distributor',
+			'manage_options',
+			'onex-menu-distributor-tambah',
+			array( $this, 'RenderMenuDistributorTambah')//'onex_jenis_delivery_tambah'
+		);*/
+
+		// Sub MENU "BANK" **********************
+		add_submenu_page(
 			'onex-main-page',
 			'Bank',
 			'Bank',
 			'manage_options',
 			'onex-bank-page',
-			'onex_bank_page'
-		);*/
-
-		// Sub MENU "MENU MAKMIN" ****************
-		/*add_submenu_page(
-			'onex-main-page',
-			'Jenis Menu',
-			'Jenis Menu',
+			array( $this, 'RenderBankList')
+		);
+		add_submenu_page(
+			null,
+			'Tambah Bank',
+			'Tambah Bank',
 			'manage_options',
-			'onex-jenis-menu-page',
-			'onex_jenis_menu_page'
-		);*/
+			'onex-bank-tambah',
+			array( $this, 'RenderBankTambah')//'onex_jenis_delivery_tambah'
+		);
+
+		// Sub MENU "PROMO" ****************
+		add_submenu_page(
+			'onex-main-page',
+			'Promo',
+			'Promo',
+			'manage_options',
+			'onex-promo-page',
+			array( $this, 'RenderPromoList')
+		);
 	}
 
 	function RenderDeliveryList(){
@@ -242,7 +287,7 @@ class Onex_Plugin{
 	}
 
 	function RenderDistributorHapus(){
-		$attributes = $this->onex_distributor_obj->GetDistributor($_GET['id']);
+		$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $_GET['id']);
 
 		return $this->getHtmlTemplate( 'distributor/templates/', 'distributor_hapus', $attributes);
 	}
@@ -272,6 +317,12 @@ class Onex_Plugin{
 		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_tambah', $attributes);
 	}
 
+	function RenderKategoriMenuUpdate(){
+		$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuDistributorById( $_GET['id']);
+
+		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_update', $attributes);
+	}
+
 	function RenderMenuDistributorList(){
 		$attributes = $this->onex_menu_distributor_obj->GetMenuDistributorList();
 
@@ -285,6 +336,30 @@ class Onex_Plugin{
 		}
 
 		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_tambah', $attributes);
+	}
+
+	function RenderLokasiList(){
+		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
+
+		return $this->getHtmlTemplate(  'lokasi/templates/', 'lokasi_main', $attributes);
+	}
+
+	function RenderBankList(){
+		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
+
+		return $this->getHtmlTemplate(  'bank/templates/', 'bank_main', $attributes);
+	}
+
+	function RenderBankTambah(){
+		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
+
+		return $this->getHtmlTemplate(  'bank/templates/', 'bank_tambah', $attributes);
+	}
+
+	function RenderPromoList(){
+		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
+
+		return $this->getHtmlTemplate(  'promo/templates/', 'promo_main', $attributes);
 	}
 
 	private function getHtmlTemplate( $location, $template_name, $attributes = null ){

@@ -1,32 +1,14 @@
 <?php
 
-class Onex_Bank{
+class Onex_Promo{
 
 	private $table_name;
 
 	function __construct(){
-		$this->table_name = "onex_bank";
-
-		add_action( 'wp_print_scripts', array ($this, 'AjaxBankLoadScripts') );
-		add_action( 'wp_ajax_AjaxGetBankList', array( $this, 'AjaxLoad_Bank_List') );
-		add_action( 'wp_ajax_AjaxGetBankDetail', array( $this, 'AjaxLoad_Bank_Detail') );
+		$this->table_name = "onex_promo";
 	}
 
-	function AjaxBankLoadScripts(){
-		wp_localize_script( 'ajax-bank', 'ajax_one_express', array( 'ajaxurl' => admin_url('admin-ajax.php')) );
-	}
-
-	function AjaxLoad_Bank_List(){
-		$attributes['bank'] = $this->GetBankAll();
-		echo getHtmlTemplate( plugin_dir_path( __FILE__ ) .'/templates/', 'bank_list', $attributes );
-		wp_die();
-	}
-
-	function AjaxLoad_Bank_Detail(){
-
-	}
-
-	public function GetBankAll(){
+	public function GetPromoAll(){
 		global $wpdb;
 		$attributes = null;
 
@@ -40,30 +22,33 @@ class Onex_Bank{
 		return $attributes;
 	}
 
-	public function AddBank( $data){
+	public function AddPromo( $data){
 		global $wpdb;
 
 		$result = array('status'=>false, 'message' =>'');
 
-		if( $wpdb->insert(
+		/*if( $wpdb->insert(
 				$this->table_name,
 				array(
-					'nama_bank' => $data['menudist_nama'],
-					'pemilik_rekening' => $data['menudist_harga'],
-					'no_rekening' => $data['menudist_gambar']
+					'nama_menudel' => $data['menudist_nama'],
+					'harga_menudel' => $data['menudist_harga'],
+					'gambar_menudel' => $data['menudist_gambar'],
+					'keterangan_menudel' => $data['menudist_keterangan'],
+					'distributor_id' => $data['menudist_distributor'],
+					'katmenu_id' => $data['menudist_kategori']
 				),
-				array('%s','%s','%s')
+				array('%s','%d','%s','%s','%d','%d')
 			)
 		){
 			$result['status'] = true;
-			$result['message'] = "Berhasil menambah bank.";
+			$result['message'] = "Berhasil menambah menu.";
 		}else{
 			$result['message'] = "Terjadi kesalahan.";
-		}
+		}*/
 		return $result;
 	}
 
-	public function UpdateBank($id, $data){
+	public function UpdatePromo($id, $data){
 		global $wpdb;
 
 		$result = array(
@@ -97,7 +82,7 @@ class Onex_Bank{
 		return $result;*/
 	}
 
-	public function DeleteBank($id){
+	public function DeletePromo($id){
 		/*global $wpdb;
 
 		if($wpdb->query(
@@ -112,7 +97,7 @@ class Onex_Bank{
 		}*/
 	}
 
-	public function GetBankById($id){
+	public function GetPromoById($id){
 		/*global $wpdb;
 
 		$row = 

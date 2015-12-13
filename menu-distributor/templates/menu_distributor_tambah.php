@@ -59,7 +59,7 @@
 		<p>Harga <strong>*</strong><br />
 			<input type="text" name="menudist-harga" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_harga; ?>" />
 		</p>
-		<p>Gambar<br />
+		<p>Gambar <strong>*</strong><br />
 			<input type="text" name="menudist-gambar-url" id="image_url" class="regular-text">
     		<input type="button" name="menudist-gambar-button" id="upload-btn" class="button-secondary" value="Upload Image">
 		</p>
