@@ -26,6 +26,32 @@ class Onex_Pemesanan_Menu{
 		return $nilai_menu;
 	}
 
+	public function GetPesananMenuByInvoice( $invoice_id ){
+		global $wpdb;
+
+		$menudel_table = "onex_menu_delivery";
+
+		$attributes = null;
+		$attributes = 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT pm.*, md.* FROM $this->table_name pm
+					LEFT JOIN $menudel_table md
+					ON pm.menudel_id=md.id_menudel
+					WHERE pm.invoice_id = %d",
+					$invoice_id
+					)
+				);
+			//var_dump($attributes);
+		return $attributes;
+	}
+
+	public function SudahDiPesan( $invoice_id, $menudel_id){
+		global $wpdb;
+
+		return $wpdb->get_var("SELECT COUNT(*) FROM $this->table_name WHERE invoice_id=$invoice_id AND menudel_id=$menudel_id");
+	}
+
 	private function getNilaiMenuDistributor($menudel_id, $kuantiti){
 		$onex_menudel_obj = new Onex_Menu_Distributor();
 		$total_harga_menu = ($onex_menudel_obj->GetHargaMenuDistributor($menudel_id) * $kuantiti);
