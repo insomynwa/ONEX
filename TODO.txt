@@ -13,8 +13,7 @@ menu_list.php
 -pagination
 -"pesan sekarang" disable
 
-gol, di chart,
-klo misal ada kasus ky gini:
-gw pesen di McD, soto, rawon, pecel. Trs gw mau cancel smua..
-gw harus klik satu2 di list order biar invoice McD gw ilang?
-apa mungkin ditambah button "Batal"?
+filter input harga/telp..
+pesan nembak ke login.. DONE
+update detail plugin OTW DONE
+subtotal + tax DONE

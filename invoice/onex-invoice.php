@@ -28,12 +28,14 @@ class Onex_Invoice{
 	public function UpdateSubtotalInvoice( $invoice_id, $nilai_menu){
 		global $wpdb;
 
+		$subtotal_n_ppn = $nilai_menu + ( $nilai_menu * 0.05) ;
+
 		$wpdb->query(
 			$wpdb->prepare(
 					"UPDATE $this->table_name 
-					SET nilai_invoice = (nilai_invoice + %d ) 
+					SET subtotal_invoice = (subtotal_invoice + %d ) 
 					WHERE id_invoice = %d",
-					$nilai_menu,
+					$subtotal_n_ppn,
 					$invoice_id
 				)
 			);

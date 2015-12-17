@@ -1,8 +1,7 @@
 <?php
 /*
-Plugin Name: One Express
+Plugin Name: OTWExpress
 Version: 1.0
-Author: Hamba Allah
 */
 include_once('jenis-delivery/onex-jenis-delivery.php');
 include_once('distributor/onex-distributor.php');
@@ -13,6 +12,8 @@ include_once('bank/onex-bank.php');
 include_once('promo/onex-promo.php');
 include_once('invoice/onex-invoice.php');
 include_once('pemesanan-menu/onex-pemesanan-menu.php');
+include_once('data-pembeli/onex-data-pembeli.php');
+include_once('ongkos-kirim/onex-ongkos-kirim.php');
 class Onex_Plugin{
 
 	private $onex_jenis_delivery_obj;
@@ -83,8 +84,8 @@ class Onex_Plugin{
 	public function create_menu(){
 		// MAIN MENU *************************
 		add_menu_page(
-			'One Express',
-			'One Express',
+			'OtwExpress',
+			'OtwExpress',
 			'manage_options',
 			'onex-main-page',
 			onex_main_page,

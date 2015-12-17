@@ -1,5 +1,5 @@
 <?php
-include_once(WP_PLUGIN_DIR . '\one-express\menu-distributor\onex-menu-distributor.php');
+include_once(WP_PLUGIN_DIR . '/one-express/menu-distributor/onex-menu-distributor.php');
 class Onex_Pemesanan_Menu{
 	private $table_name;
 

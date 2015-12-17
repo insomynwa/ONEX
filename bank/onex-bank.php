@@ -18,12 +18,22 @@ class Onex_Bank{
 
 	function AjaxLoad_Bank_List(){
 		$attributes['bank'] = $this->GetBankAll();
-		echo getHtmlTemplate( plugin_dir_path( __FILE__ ) .'/templates/', 'bank_list', $attributes );
+		echo $this->getHtmlTemplate( plugin_dir_path( __FILE__ ) .'/templates/', 'bank_list', $attributes );
 		wp_die();
 	}
 
 	function AjaxLoad_Bank_Detail(){
 
+	}
+
+	private function getHtmlTemplate( $location, $template_name, $attributes = null ){
+		if(! $attributes) $attributes = array();
+
+		ob_start();
+		require( $location . $template_name . '.php');
+		$html = ob_get_contents();
+		ob_end_clean();
+		echo $html;
 	}
 
 	public function GetBankAll(){

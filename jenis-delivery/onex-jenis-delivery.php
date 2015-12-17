@@ -1,6 +1,6 @@
 <?php
 
-include_once(WP_PLUGIN_DIR . '\one-express\distributor\onex-distributor.php');
+include_once(WP_PLUGIN_DIR . '/one-express/distributor/onex-distributor.php');
 class Onex_Jenis_Delivery{
 	private $table_name;
 

@@ -1,9 +1,9 @@
 <?php
 
-include_once(WP_PLUGIN_DIR . '\one-express\template-set\onex_template.php');
-include_once(WP_PLUGIN_DIR . '\one-express\jenis-delivery\onex-jenis-delivery.php');
-include_once(WP_PLUGIN_DIR . '\one-express\kategori-menu\onex-kategori-menu.php');
-include_once(WP_PLUGIN_DIR . '\one-express\menu-distributor\onex-menu-distributor.php');
+include_once(WP_PLUGIN_DIR . '/one-express/template-set/onex_template.php');
+include_once(WP_PLUGIN_DIR . '/one-express/jenis-delivery/onex-jenis-delivery.php');
+include_once(WP_PLUGIN_DIR . '/one-express/kategori-menu/onex-kategori-menu.php');
+include_once(WP_PLUGIN_DIR . '/one-express/menu-distributor/onex-menu-distributor.php');
 class Onex_Distributor{
 
 	private $table_name;
@@ -232,6 +232,20 @@ class Onex_Distributor{
 			);
 		$attributes = $row;
 		return $attributes;
+	}
+
+	public function GetAlamatDistributor( $id_distributor){
+		global $wpdb;
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT alamat_dist FROM $this->table_name WHERE id_dist = %d",
+					$id_distributor
+					), 
+				ARRAY_A
+				);
+
+		return $row['alamat_dist'];
 	}
 
 	private function getHtmlTemplate( $location, $template_name, $attributes = null ){
