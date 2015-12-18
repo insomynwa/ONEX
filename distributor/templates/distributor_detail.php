@@ -15,11 +15,14 @@
 		<tr>
 			<th>No</th>
 			<th>Nama Menu</th>
+			<th></th>
 		</tr>
 		<?php $nmr=1; foreach( $attributes['distributor_rel']['menudist'][$kategori->nama_katmenu] as $menu ): ?>
 		<tr>
 			<td><?php echo $nmr; ?></td>
 			<td><?php echo $menu->nama_menudel; ?></td>
+			<td><a href="<?php echo admin_url('admin.php?page=onex-menu-distributor-hapus&menu='. $menu->id_menudel); ?>">Delete</a> | 
+				<a href="<?php echo admin_url('admin.php?page=onex-menu-distributor-update&menu='. $menu->id_menudel); ?>">Update</a></td>
 		</tr>
 		<?php $nmr+=1; endforeach; ?>
 	</table>

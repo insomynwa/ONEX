@@ -114,7 +114,7 @@ class Onex_Menu_Distributor{
 	}
 
 	public function UpdateMenuDistributor($id, $data){
-		/*global $wpdb;
+		global $wpdb;
 
 		$result = array(
 					'status' => false,
@@ -125,41 +125,40 @@ class Onex_Menu_Distributor{
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'nama' => $data['dist_nama'],
-				'alamat' => $data['dist_alamat'],
-				'kategori_delivery' => $data['dist_jenis_delivery'],
-				'telp' => $data['dist_telp'],
-				'email' => $data['dist_email'],
-				'keterangan' => $data['dist_keterangan'],
-				'gambar' => $data['dist_gambar']
+				'nama_menudel' => $data['menudist_nama'],
+				'harga_menudel' => $data['menudist_harga'],
+				'gambar_menudel' => $data['menudist_gambar'],
+				'keterangan_menudel' => $data['menudist_keterangan'],
+				'distributor_id' => $data['menudist_distributor'],
+				'katmenu_id' => $data['menudist_kategori']
 			),
-			array('id_dist' => $id),
-			array('%s','%s'),
+			array('id_menudel' => $id),
+			array('%s','%s', '%s', '%s', '%d', '%d'),
 			array('%d')
 		)){
 			$result['status'] = true;
-			$result['message'] = 'Distributor berhasil diperbaharui.';
+			$result['message'] = 'berhasil diperbaharui.';
 		}else{
 			$result['status'] = true;
-			$result['message'] = 'Tidak ada pembaharuan distributor.';
+			$result['message'] = 'Tidak ada pembaharuan.';
 		}
 
-		return $result;*/
+		return $result;
 	}
 
-	public function DeleteMenuDistributor($id){
-		/*global $wpdb;
+	public function DeleteMenuDistributor( $menudel_id){
+		global $wpdb;
 
 		if($wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM $this->table_name WHERE id_dist = %d",
-				$id
+				"DELETE FROM $this->table_name WHERE id_menudel = %d",
+				$menudel_id
 			)
 		)){
-			return 'Berhasil menghapus Distributor.';
+			return 'Berhasil menghapus Menu.';
 		}else{
 			return 'Terjadi Kesalahan.';
-		}*/
+		}
 	}
 
 	public function GetHargaMenuDistributor($menudel_id){
@@ -177,18 +176,19 @@ class Onex_Menu_Distributor{
 		return $row['harga_menudel'];
 	}
 
-	public function GetMenuDistributor($id){
-		/*global $wpdb;
+	public function GetMenuDistributorById( $menudel_id ){
+		global $wpdb;
 
 		$row = 
 			$wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM $this->table_name WHERE id_dist = %d",
-					$id
+					"SELECT * FROM $this->table_name
+					WHERE id_menudel = %d",
+					$menudel_id
 				), ARRAY_A
 			);
-		$attributes['distributor'] = $row;
-		return $attributes;*/
+		$attributes = $row;
+		return $attributes;
 	}
 }
 

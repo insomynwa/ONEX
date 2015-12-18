@@ -12,8 +12,8 @@ invoice
 menu_list.php
 -pagination
 -"pesan sekarang" disable
-
 filter input harga/telp..
 pesan nembak ke login.. DONE
 update detail plugin OTW DONE
 subtotal + tax DONE
+harga satuan menu di pemesanan

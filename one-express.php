@@ -205,6 +205,22 @@ class Onex_Plugin{
 			'onex-menu-distributor-tambah',
 			array( $this, 'RenderMenuDistributorTambah')//'onex_jenis_delivery_tambah'
 		);
+		add_submenu_page(
+			null,
+			'Hapus Menu Distributor',
+			'Hapus Menu Distributor',
+			'manage_options',
+			'onex-menu-distributor-hapus',
+			array( $this, 'RenderMenuDistributorHapus')
+		);
+		add_submenu_page(
+			null,
+			'Update Menu Distributor',
+			'Update Menu Distributor',
+			'manage_options',
+			'onex-menu-distributor-update',
+			array( $this, 'RenderMenuDistributorUpdate')
+		);
 
 		// Sub MENU "LOKASI"
 		add_submenu_page(
@@ -339,6 +355,22 @@ class Onex_Plugin{
 		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_tambah', $attributes);
 	}
 
+	function RenderMenuDistributorHapus(){
+		//var_dump($_GET['id']);
+		$attributes['menudel'] = $this->onex_menu_distributor_obj->GetMenuDistributorById( $_GET['menu'] );
+
+		return $this->getHtmlTemplate( 'menu-distributor/templates/', 'menu_distributor_hapus', $attributes);
+	}
+
+	function RenderMenuDistributorUpdate(){
+		
+		$attributes['menudel'] = $this->onex_menu_distributor_obj->GetMenuDistributorById( $_GET['menu']);
+		$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $attributes['menudel']['distributor_id']);
+		$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $attributes['menudel']['katmenu_id']);
+
+		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_update', $attributes);
+	}
+
 	function RenderLokasiList(){
 		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
@@ -376,39 +408,6 @@ class Onex_Plugin{
 
 $onex_plugin_obj = new Onex_Plugin();
 
-
-/*function get_jenis_delivery(){
-	$delivery_obj = new Onex_Jenis_Delivery();
-	$content['katdel'] = $delivery_obj->DeliveryList();
-	return $content;
-}
-
-function get_distributor(){
-	$distributor_obj = new Onex_Distributor();
-	$content = $distributor_obj->DistributorList();
-	return $content;
-}
-
-function get_distributor_by_template($template_name){
-	$distributor = new Onex_Distributor();
-	$content['distributor'] = $distributor->GetDistributorByTemplate($template_name);
-	return $content;
-}*/
-
-/*function get_distributor_by_id(){
-	$onex_distributor_obj = new Onex_Distributor();
-	$onex_kategori_menu_obj = new Onex_Kategori_Menu();
-	$content['distributor'] = $onex_distributor_obj->GetDistributor( $_GET['distributor']);
-	$content['katmenu'] = $onex_kategori_menu_obj->GetKategoriByDistributor( $_GET['distributor'] );
-
-	return $content;
-}*/
-
-/*function get_kategori_menu(){
-	$katmenu_obj = new Onex_Kategori_Menu();
-	$content = $katmenu_obj->GetKategoriMenuList();
-	return $content;
-}*/
 
 register_activation_hook( __FILE__, array('Onex_Plugin', 'plugin_activated'));
 
