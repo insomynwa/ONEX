@@ -65,7 +65,7 @@
     		<input type="button" name="menudist-gambar-button" id="upload-btn" class="button-secondary" value="Upload Image">
 		</p>
 		<p>
-			<input type="submit" name="menudist-update-submit" value="Tambah" />
+			<input type="submit" name="menudist-update-submit" value="Update" />
 		</p>
 	</form>
 	<a href="<?php echo admin_url('admin.php?page=onex-distributor-page'); ?>">kembali ke Daftar Distributor</a>
