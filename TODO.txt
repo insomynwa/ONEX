@@ -6,14 +6,13 @@ tax
 bank
 promo
 message
-kode invoice DONE
 invoice
-
-menu_list.php
--pagination
--"pesan sekarang" disable
 filter input harga/telp..
+harga satuan menu di pemesanan
+
+
+kode invoice DONE
 pesan nembak ke login.. DONE
 update detail plugin OTW DONE
 subtotal + tax DONE
-harga satuan menu di pemesanan
+-"pesan sekarang" disable DONE

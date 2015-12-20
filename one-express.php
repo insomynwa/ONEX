@@ -23,6 +23,7 @@ class Onex_Plugin{
 	private $onex_lokasi_obj;
 	private $onex_bank_obj;
 	private $onex_promo_obj;
+	private $onex_invoice_obj;
 
 	public function __construct(){
 		$this->onex_jenis_delivery_obj = new Onex_Jenis_Delivery();
@@ -32,9 +33,11 @@ class Onex_Plugin{
 		$this->onex_lokasi_obj = new Onex_Lokasi();
 		$this->onex_bank_obj = new Onex_Bank();
 		$this->onex_promo_obj = new Onex_Promo();
+		$this->onex_invoice_obj = new Onex_Invoice();
 
 		add_action('admin_menu', array( $this, 'create_menu') );
 		add_action('admin_enqueue_scripts', array( $this, 'load_wp_media_files'));
+		add_action('my_hourly_event', array( $this, 'deactivateInvoiceAfter24hours'));
 
 		/*add_action('wp_print_scripts', array( $this, 'test_ajax_load_scripts')) ;
 		add_action('wp_ajax_test_response', array( $this, 'text_ajax_process_request')) ;*/
@@ -75,6 +78,12 @@ class Onex_Plugin{
 				);
 			}
 		}*/
+
+		wp_schedule_event( current_time('timestamp'), 'hourly', 'my_hourly_event');
+	}
+
+	function deactivateInvoiceAfter24hours(){
+		$this->onex_invoice_obj->DeactivateInvoice();
 	}
 
 	function load_wp_media_files(){
@@ -224,7 +233,7 @@ class Onex_Plugin{
 
 		// Sub MENU "LOKASI"
 		add_submenu_page(
-			'onex-main-page',
+			null,//'onex-main-page',
 			'Lokasi',
 			'Lokasi',
 			'manage_options',
@@ -260,7 +269,7 @@ class Onex_Plugin{
 
 		// Sub MENU "PROMO" ****************
 		add_submenu_page(
-			'onex-main-page',
+			null,//'onex-main-page',
 			'Promo',
 			'Promo',
 			'manage_options',
@@ -296,6 +305,8 @@ class Onex_Plugin{
 	function RenderDistributorList(){
 		//$attributes = $this->onex_distributor_obj->DistributorList();
 		//var_dump($attributes);
+        $schedule = wp_get_schedule( 'my_hourly_event' );
+        var_dump($schedule);
 		return $this->getHtmlTemplate(  'distributor/templates/', 'distributor_main', $attributes);
 	}
 
@@ -363,7 +374,7 @@ class Onex_Plugin{
 	}
 
 	function RenderMenuDistributorUpdate(){
-		
+
 		$attributes['menudel'] = $this->onex_menu_distributor_obj->GetMenuDistributorById( $_GET['menu']);
 		$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $attributes['menudel']['distributor_id']);
 		$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $attributes['menudel']['katmenu_id']);

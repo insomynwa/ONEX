@@ -10,7 +10,7 @@ class Onex_Pemesanan_Menu{
 	public function AddPemesananMenu($data){
 		global $wpdb;
 
-		$nilai_menu = $this->getNilaiMenuDistributor( $data['menudel_id'], $data['kuantiti']);
+		$nilai_menu = $data['kuantiti'] * $data['harga'];//$this->getNilaiMenuDistributor( $data['menudel_id'], $data['kuantiti']);
 
 		$wpdb->insert(
 				$this->table_name,
@@ -18,12 +18,13 @@ class Onex_Pemesanan_Menu{
 					'menudel_id' => $data['menudel_id'],
 					'jumlah_pesanan' => $data['kuantiti'],
 					'nilai_pesanan' => $nilai_menu,
+					'harga_satuan' => $data['harga'],
 					'invoice_id' => $data['invoice_id']
 					),
-				array( '%d', '%d', '%d', '%d')
+				array( '%d', '%d', '%d', '%d', '%d')
 			);
 		//var_dump($nilai_menu);
-		return $nilai_menu;
+		//return $nilai_menu;
 	}
 
 	public function GetPesananMenuByInvoice( $invoice_id ){
@@ -46,18 +47,34 @@ class Onex_Pemesanan_Menu{
 		return $attributes;
 	}
 
+	public function GetTotalNilaiPesanan( $invoice_id){
+		global $wpdb;
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT SUM(nilai_pesanan) AS total_nilai FROM $this->table_name 
+					WHERE invoice_id = %d",
+					$invoice_id
+					),
+				ARRAY_A
+				);
+
+		return $row['total_nilai'];
+	}
+
 	public function SudahDiPesan( $invoice_id, $menudel_id){
 		global $wpdb;
 
 		return $wpdb->get_var("SELECT COUNT(*) FROM $this->table_name WHERE invoice_id=$invoice_id AND menudel_id=$menudel_id");
 	}
 
-	private function getNilaiMenuDistributor($menudel_id, $kuantiti){
+	/*private function getNilaiMenuDistributor($menudel_id, $kuantiti){
 		$onex_menudel_obj = new Onex_Menu_Distributor();
 		$total_harga_menu = ($onex_menudel_obj->GetHargaMenuDistributor($menudel_id) * $kuantiti);
 		//var_dump($total_harga_menu);
 		return $total_harga_menu;
-	}
+	}*/
 
 }
 ?>
