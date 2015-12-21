@@ -3,8 +3,106 @@ class Onex_Invoice{
 
 	private $table_name;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $tgl;
+	public function GetTgl(){ return $this->tgl; }
+
+	private $nomor;
+	public function GetNomor() { return $this->nomor; }
+	public function SetNomor(){ 
+		$this->nomor = $this->generateNomorInvoice(); 
+	}
+
+	private $status_active;
+	public function GetStatusActive() { return $this->status_active; }
+	public function SetStatusActive($status) { $this->status_active = $status; }
+
+	private $user;
+	public function GetUser() { return $this->user; }
+	public function SetUser($user) { $this->user = $user; }
+
+	private $distributor;
+	public function GetDistributor() { return $this->distributor; }
+	public function SetDistributor($distributor) { $this->distributor = $distributor; }
+
+	private $status_confirm;
+	public function GetStatusConfirm() { return $this->status_confirm; }
+	public function SetStatusConfirm($status) { $this->status_confirm = $status; }
+
+	private $jam_kirim;
+	public function GetJamKirim() { return $this->jam_kirim; }
+	public function SetJamKirim($jam_kirim) { $this->jam_kirim = $jam_kirim; }
+
+	private $jarak_kirim;
+	public function GetJarakKirim() { return $this->jarak_kirim; }
+	public function SetJarakKirim($jarak_kirim) { $this->jarak_kirim = $jarak_kirim; }
+
+	private $biaya_kirim;
+	public function GetBiayaKirim() { return $this->biaya_kirim; }
+	public function SetBiayaKirim($biaya_kirim) { $this->biaya_kirim = $biaya_kirim; }
+
+
 	public function __construct(){
 		$this->table_name = "onex_invoice";
+	}
+
+	public function SetAnInvoice_Id( $id){
+		global $wpdb;
+
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name 
+					WHERE id_invoice = %d",
+					$id
+					),
+				ARRAY_A
+				);
+
+		$this->id = 0;
+		if( !is_null($row) ){
+			$this->id = $row['id_invoice'];
+			$this->tgl = $row['tgl_invoice'];
+			$this->nomor = $row['no_invoice'];
+			$this->status_active = $row['status_aktif_invoice'];
+			$this->user = $row['user_id'];
+			$this->distributor = $row['distributor_id'];
+			$this->status_confirm = $row['status_user_confirm'];
+			$this->jam_kirim = $row['jam_kirim_invoice'];
+			$this->jarak_kirim = $row['jarak_kirim_invoice'];
+			$this->biaya_kirim = $row['biaya_kirim_invoice']; 
+		}
+	}
+
+	public function SetAnActiveInvoice_UserDistributor( $user, $distributor){
+		global $wpdb;
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT i.* FROM $this->table_name i
+					WHERE i.user_id = %d AND i.status_aktif_invoice = '%d' AND 
+						i.distributor_id = %d",
+						$user, 1,
+						$distributor
+					),
+				ARRAY_A
+				);
+
+		$this->id = 0;
+		if( !is_null($row) ){
+			$this->id = $row['id_invoice'];
+			$this->tgl = $row['tgl_invoice'];
+			$this->nomor = $row['no_invoice'];
+			$this->status_active = $row['status_aktif_invoice'];
+			$this->user = $row['user_id'];
+			$this->distributor = $row['distributor_id'];
+			$this->status_confirm = $row['status_user_confirm'];
+			$this->jam_kirim = $row['jam_kirim_invoice'];
+			$this->jarak_kirim = $row['jarak_kirim_invoice'];
+			$this->biaya_kirim = $row['biaya_kirim_invoice']; 
+		}
 	}
 
 	public function CreateInvoice( $user_id, $invoice_data){
@@ -27,23 +125,26 @@ class Onex_Invoice{
 		return 0;
 	}
 
-	/*public function UpdateTotalInvoice( $invoice_id, $nilai_menu_ppn, $ongkir){
+	public function CreateNewInvoice(){
 		global $wpdb;
 
-		//$total_n_ppn = $nilai_menu + ( $nilai_menu * 0.05) ; // harga total menu + ppn(5%)
-		$total = $nilai_menu_ppn + $ongkir;
-
-		$wpdb->query(
-			$wpdb->prepare(
-					"UPDATE $this->table_name 
-					SET total_invoice = (total_invoice + %d ) 
-					WHERE id_invoice = %d",
-					$total,
-					$invoice_id
-				)
-			);
-		//var_dump($nilai_menu);
-	}*/
+		//$no_invoice = $this->generateNomorInvoice();
+		if($wpdb->insert(
+				$this->table_name,
+				array(
+					'no_invoice' => $this->nomor,
+					'user_id' => $this->user,
+					'distributor_id' => $this->distributor,
+					'jarak_kirim_invoice' => $this->jarak_kirim,
+					'biaya_kirim_invoice' => $this->biaya_kirim
+					),
+				array( '%s', '%d', '%d', '%d', '%d')
+			)){
+			$this->id = $wpdb->insert_id;
+		}else{
+			$this->id = 0;
+		}
+	}
 
 	public function GetInvoiceDistributor( $invoice_id){
 		global $wpdb;

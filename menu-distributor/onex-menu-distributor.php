@@ -7,9 +7,61 @@ class Onex_Menu_Distributor{
 	private $table_name;
 	private $table_kategori_menu;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama( $nama ) { $this->nama = $nama; }
+
+	private $harga;
+	public function GetHarga() { return $this->harga; }
+	public function SetHarga( $harga ) { $this->harga = $harga; }
+	
+	private $gambar;
+	public function GetGambar() { return $this->gambar; }
+	public function SetGambar($gambar) { $this->gambar = $gambar; }
+	
+	private $keterangan;
+	public function GetKeterangan() { return $this->keterangan; }
+	public function SetKeterangan($keterangan) { $this->keterangan = $keterangan; }
+
+	private $distributor;
+	public function GetDistributor() { return $this->distributor; }
+	public function SetDistributor($distributor) { $this->distributor = $distributor; }
+
+	private $katmenu;
+	public function GetKatmenu() { return $this->katmenu; }
+	public function SetKatmenu($katmenu) { $this->katmenu = $katmenu; }
+
 	function __construct(){
 		$this->table_name = "onex_menu_delivery";
 		$this->table_kategori_menu = "onex_kategori_menu";
+	}
+
+	public function SetAMenuDistributor( $id ){
+		global $wpdb;
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE id_menudel = %d",
+					$id
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row) ){
+			$this->id = $row['id_menudel'];
+			$this->nama = $row['nama_menudel'];
+			$this->harga = $row['harga_menudel'];
+			$this->gambar = $row['gambar_menudel'];
+			$this->keterangan = $row['keterangan_menudel'];
+			$this->distributor = $row['distributor_id'];
+			$this->katmenu = $row['katmenu_id'];
+		}
 	}
 
 	public function GetMenuDistributorList(){

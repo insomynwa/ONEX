@@ -2,9 +2,58 @@
 class Onex_Data_Pembeli{
 
 	private $table_name;
+	
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama( $nama ) { $this->nama = $nama; }
+
+	private $telp;
+	public function GetTelp() { return $this->telp; }
+	public function SetTelp( $telp ) { $this->telp = $telp; }
+
+	private $alamat_area;
+	public function GetAlamatArea() { return $this->alamat_area; }
+	public function SetAlamatArea( $alamat_area ) { $this->alamat_area = $alamat_area; }
+
+	private $alamat_detail;
+	public function GetAlamatDetail() { return $this->alamat_detail; }
+	public function SetAlamatDetail( $alamat_detail ) { $this->alamat_detail = $alamat_detail; }
+
+	private $user;
+	public function GetUser() { return $this->user; }
+	public function SetUser( $user ) { $this->user = $user; }
 
 	public function __construct(){
 		$this->table_name = "onex_data_pembeli";
+	}
+
+	public function SetDataPembeliUser( $user_id ){
+		global $wpdb;
+
+		$alamat_area_table = "onex_alamat_area";
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT dp.* FROM $this->table_name dp
+					WHERE dp.user_id = %d",
+					$user_id
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row) ){
+			$this->id = $row['id_datapembeli'];
+			$this->nama = $row['nama_datapembeli'];
+			$this->telp = $row['telp_datapembeli'];
+			$this->alamat_area = $row['alamatarea_id'];
+			$this->alamat_detail = $row['alamat_detail_datapembeli'];
+			$this->user = $row['user_id'];
+		}
 	}
 
 	public function GetDataPembeliByUser( $customer_id ){

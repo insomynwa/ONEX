@@ -9,6 +9,42 @@ class Onex_Distributor{
 	private $table_name;
 	private $table_jenis_delivery;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama($nama) { $this->nama = $nama; }
+
+	private $alamat;
+	public function GetAlamat() { return $this->alamat; }
+	public function SetAlamat($alamat) { $this->alamat = $alamat; }
+	
+	private $telp;
+	public function GetTelp() { return $this->telp; }
+	public function SetTelp($telp) { $this->telp = $telp; }
+	
+	private $email;
+	public function GetEmail() { return $this->email; }
+	public function SetEmail($email) { $this->email = $email; }
+	
+	private $keterangan;
+	public function GetKeterangan() { return $this->keterangan; }
+	public function SetKeterangan($keterangan) { $this->keterangan = $keterangan; }
+	
+	private $gambar;
+	public function GetGambar() { return $this->gambar; }
+	public function SetGambar($gambar) { $this->gambar = $gambar; }
+	
+	private $katdel;
+	public function GetKatdel() { return $this->katdel; }
+	public function SetKatdel($katdel) { $this->katdel = $katdel; }
+	
+	private $kode;
+	public function GetKode() { return $this->kode; }
+	public function SetKode($kode) { $this->kode = $kode; }
+
+
 	function __construct(){
 		$this->table_name = "onex_distributor";
 		$this->table_jenis_delivery = "onex_kategori_delivery";
@@ -52,6 +88,32 @@ class Onex_Distributor{
 			
 			echo $this->getHtmlTemplate(  'templates/', 'distributor_detail', $attributes);
 			wp_die();
+		}
+	}
+
+	public function SetADistributor( $id){
+		global $wpdb;
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE id_dist = %d ",
+					$id 
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row )) {
+			$this->id = $row['id_dist'];
+			$this->nama = $row['nama_dist'];
+			$this->alamat = $row['alamat_dist'];
+			$this->telp = $row['telp_dist'];
+			$this->email = $row['email_dist'];
+			$this->keterangan = $row['keterangan_dist'];
+			$this->gambar = $row['gambar_dist'];
+			$this->katdel = $row['katdel_id'];
+			$this->kode = $row['kode_dist'];
 		}
 	}
 
