@@ -48,6 +48,22 @@ class Onex_Invoice{
 		$this->table_name = "onex_invoice";
 	}
 
+	public function DeleteInvoice(){
+		global $wpdb;
+
+		if(
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM $this->table_name WHERE id_invoice = %d",
+					$this->id
+					)
+				)
+			){
+			return true;
+		}
+		return false;
+	}
+
 	public function SetAnInvoice_Id( $id){
 		global $wpdb;
 

@@ -7,6 +7,21 @@ class Onex_Kategori_Menu{
 	private $table_name;
 	private $table_distributor;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama( $nama ) { $this->nama = $nama; }
+	
+	private $keterangan;
+	public function GetKeterangan() { return $this->keterangan; }
+	public function SetKeterangan($keterangan) { $this->keterangan = $keterangan; }
+
+	private $distributor;
+	public function GetDistributor() { return $this->distributor; }
+	public function SetDistributor($distributor) { $this->distributor = $distributor; }
+
 	function __construct(){
 		$this->table_name = "onex_kategori_menu";
 		$this->table_distributor = "onex_distributor";
@@ -23,6 +38,27 @@ class Onex_Kategori_Menu{
 		$attributes['katmenu'] = $this->GetKategoriMenuList();
 		echo $this->getHtmlTemplate( 'templates/', 'kategori_menu_list', $attributes);
 		wp_die();
+	}
+
+	public function SetAKategoriMenu( $id){
+		global $wpdb;
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE id_katmenu = %d ",
+					$id 
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row )) {
+			$this->id = $row['id_katmenu'];
+			$this->nama = $row['nama_katmenu'];
+			$this->keterangan = $row['keterangan_katmenu'];
+			$this->distributor = $row['distributor_id'];
+		}
 	}
 
 	/**

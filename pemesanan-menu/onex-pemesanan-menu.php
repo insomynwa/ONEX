@@ -46,6 +46,21 @@ class Onex_Pemesanan_Menu{
 			);
 	}
 
+	public function HasAnyMenu_Invoice( $invoice_id){
+		global $wpdb;
+
+		$row = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM $this->table_name 
+				WHERE invoice_id = %d",
+				$invoice_id
+				)
+			);
+		//var_dump($row);
+		if( $row > 0) return true;
+		return false;
+	}
+
 	public function UpdateJumlahPemesanan(){
 		global $wpdb;
 

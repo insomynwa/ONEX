@@ -4,6 +4,21 @@ include_once(WP_PLUGIN_DIR . '/one-express/distributor/onex-distributor.php');
 class Onex_Jenis_Delivery{
 	private $table_name;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama( $nama ) { $this->nama = $nama; }
+	
+	private $keterangan;
+	public function GetKeterangan() { return $this->keterangan; }
+	public function SetKeterangan($keterangan) { $this->keterangan = $keterangan; }
+
+	private $template;
+	public function GetTemplate() { return $this->template; }
+	public function SetTemplate($template) { $this->template = $template; }
+
 	public function __construct(){
 		$this->table_name = "onex_kategori_delivery";
 
@@ -31,6 +46,27 @@ class Onex_Jenis_Delivery{
 			echo $this->getHtmlTemplate( 'templates/', 'delivery_detail', $attributes );
 		}
 		wp_die();
+	}
+
+	public function SetAJenisDelivery( $id){
+		global $wpdb;
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE id_katdel = %d ",
+					$id 
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row )) {
+			$this->id = $row['id_katdel'];
+			$this->nama = $row['nama_katdel'];
+			$this->keterangan = $row['keterangan_katdel'];
+			$this->template = $row['template_id'];
+		}
 	}
 
 	public function DeliveryList(){
