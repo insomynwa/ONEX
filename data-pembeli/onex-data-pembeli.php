@@ -30,6 +30,19 @@ class Onex_Data_Pembeli{
 		$this->table_name = "onex_data_pembeli";
 	}
 
+	public function GetAll_User_DataPembeli(){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT user_id FROM $this->table_name",
+					null
+					)
+				);
+		return $result;
+	}
+
 	public function SetDataPembeliUser( $user_id ){
 		global $wpdb;
 

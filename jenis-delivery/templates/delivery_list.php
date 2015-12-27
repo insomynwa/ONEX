@@ -1,5 +1,5 @@
 <a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-tambah'); ?>' >Tambah</a>
-<table>
+<table class="table table-hover table-responsive">
 	<tr><th>No</th>
 		<th>Jenis Delivery</th>
 		<!-- <th>Keterangan</th> -->
@@ -8,20 +8,21 @@
 	</tr>
 	<?php 
 		$nmr = 1;
-		if( count($attributes['katdel']) > 0 ): ?>
-		<?php foreach($attributes['katdel'] as $katdel ): ?>
+		if( sizeof($attributes['katdel']) > 0 && !is_null($attributes) && !empty($attributes) ): ?>
+		<?php for($i=0; $i< sizeof($attributes['katdel']); $i++): ?>
+		<?php $katdel = $attributes['katdel'][$i]; ?>
 			<tr>
 				<td><?php echo $nmr; ?></td>
-				<td><?php echo $katdel->nama_katdel; ?></td>
+				<td><?php echo $katdel->GetNama(); ?></td>
 				<!-- <td><?php //echo $katdel->keterangan; ?></td> -->
-				<td><a id="katdel-id_<?php echo $katdel->id_katdel; ?>" class="katdel-detail-link" href="#">Detail</a></td>
+				<td><a id="katdel-id_<?php echo $katdel->GetId(); ?>" class="katdel-detail-link" href="#">Detail</a></td>
 				<td>
-					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-hapus&id='. $katdel->id_katdel); ?>'>Hapus</a> | 
-					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-update&id='. $katdel->id_katdel); ?>'>Update</a>
+					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-hapus&id='. $katdel->GetId()); ?>'>Hapus</a> | 
+					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-update&id='. $katdel->GetId()); ?>'>Update</a>
 				</td>
 			</tr>
 			<?php $nmr += 1; ?>
-		<?php endforeach; ?>
+		<?php endfor; ?>
 	<?php endif; ?>
 </table>
 <a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-tambah'); ?>' >Tambah</a>
@@ -33,7 +34,7 @@
 			//alert(id_dist);
 
 			var data = {
-				action: 'AjaxGetJenisDeliveryDetail',
+				action: 'AjaxRetrieveJenisDeliveryDetail',
 				kategori_delivery: id_katdel
 			};
 

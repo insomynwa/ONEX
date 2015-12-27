@@ -50,26 +50,26 @@ class Onex_Distributor{
 		$this->table_jenis_delivery = "onex_kategori_delivery";
 
 
-		add_action('wp_print_scripts', array( $this, 'AjaxDistributorLoadScripts')) ;
-		add_action('wp_ajax_AjaxGetDistributorList', array( $this, 'AjaxLoad_Distributor_List')) ;
-		add_action('wp_ajax_AjaxGetDistributorDetail', array( $this, 'AjaxLoad_Distributor_Detail')) ;
+		//add_action('wp_print_scripts', array( $this, 'AjaxDistributorLoadScripts')) ;
+		// add_action('wp_ajax_AjaxGetDistributorList', array( $this, 'AjaxLoad_Distributor_List')) ;
+		// add_action('wp_ajax_AjaxGetDistributorDetail', array( $this, 'AjaxLoad_Distributor_Detail')) ;
 	}
 
-	function AjaxDistributorLoadScripts(){
+	/*function AjaxDistributorLoadScripts(){
 		// load our jquery file that sends the $.post request
 		wp_enqueue_script( "ajax-distributor", plugin_dir_url( __FILE__ ) . '../js/ajax-distributor.js', array( 'jquery' ) );
 	 
 		// make the ajaxurl var available to the above script
 		wp_localize_script( 'ajax-distributor', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );	
-	}
+	}*/
 
-	function AjaxLoad_Distributor_List(){
+	/*function AjaxLoad_Distributor_List(){
 		$attributes['distributor'] = $this->DistributorList();
 		echo $this->getHtmlTemplate(  'templates/', 'distributor_list', $attributes);
 		wp_die();
-	}
+	}*/
 
-	function AjaxLoad_Distributor_Detail(){
+	/*function AjaxLoad_Distributor_Detail(){
 		// first check if data is being sent and that it is the data we want
 	  	if ( isset( $_GET["distributor"] ) ) {
 			// now set our response var equal to that of the POST var (this will need to be sanitized based on what you're doing with with it)
@@ -89,16 +89,16 @@ class Onex_Distributor{
 			echo $this->getHtmlTemplate(  'templates/', 'distributor_detail', $attributes);
 			wp_die();
 		}
-	}
+	}*/
 
-	public function SetADistributor( $id){
+	public function SetADistributor( $distributor_id){
 		global $wpdb;
 		$row = 
 			$wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name
 					WHERE id_dist = %d ",
-					$id 
+					$distributor_id 
 					),
 				ARRAY_A
 				);
@@ -115,6 +115,55 @@ class Onex_Distributor{
 			$this->katdel = $row['katdel_id'];
 			$this->kode = $row['kode_dist'];
 		}
+	}
+
+	public function GetAllDistributor(){
+		global $wpdb;
+		
+		$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_dist FROM $this->table_name
+						 ORDER BY nama_dist ASC"
+						 ,null
+					)
+				);
+
+		return $result;
+	}
+
+	public function UpdateDistributor(){
+		global $wpdb;
+
+		$result = array(
+					'status' => false,
+					'message' => ''
+				);
+		//if ($data['dist_gambar'] == '' ) $data['dist_gambar'] = 'NOIMAGE';
+
+		if($wpdb->update(
+			$this->table_name,
+			array(
+				'nama_dist' => $this->nama,
+				'alamat_dist' => $this->alamat,
+				'katdel_id' => $this->katdel,
+				'telp_dist' => $this->telp,
+				'email_dist' => $this->email,
+				'keterangan_dist' => $this->keterangan,
+				'gambar_dist' => $this->gambar,
+				'kode_dist' => $this->kode
+			),
+			array('id_dist' => $this->id),
+			array('%s','%s','%d','%s','%s','%s', '%s', '%s'),
+			array('%d')
+		)){
+			$result['status'] = true;
+			$result['message'] = 'Distributor berhasil diperbaharui.';
+		}else{
+			//$result['status'] = true;
+			$result['message'] = 'Gagal update.';
+		}
+
+		return $result;
 	}
 
 	public function DistributorList(){
@@ -184,6 +233,21 @@ class Onex_Distributor{
 		return $attributes;
 	}
 
+	public function GetAll_Id_Distributor_JenisDelivery( $katdel_id){
+		global $wpdb;
+
+		$result = 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_dist FROM $this->table_name
+					WHERE katdel_id = %d",
+					$katdel_id
+				)
+			);
+
+		return $result;
+	}
+
 	public function GetDistributorByJenisDelivery($id){
 		global $wpdb;
 
@@ -232,7 +296,7 @@ class Onex_Distributor{
 		return $result;
 	}
 
-	public function UpdateDistributor($id, $data){
+	/*public function UpdateDistributor($id, $data){
 		global $wpdb;
 
 		$result = array(
@@ -265,9 +329,9 @@ class Onex_Distributor{
 		}
 
 		return $result;
-	}
+	}*/
 
-	public function DeleteDistributor($id){
+	/*public function DeleteDistributor($id){
 		global $wpdb;
 
 		if($wpdb->query(
@@ -280,6 +344,37 @@ class Onex_Distributor{
 		}else{
 			return 'Terjadi Kesalahan.';
 		}
+	}*/
+
+	public function DeleteDistributor(){
+		global $wpdb;
+
+		$result = array( 'status' => false, 'message' => '');
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE id_dist = %d",
+				$this->id
+			)
+		)){
+			$result['status'] = true;
+			$result['message'] = 'Berhasil menghapus Distributor.';
+		}else{
+			$result['message'] = 'Terjadi Kesalahan.';
+		}
+
+		return $result;
+	}
+
+	public function DeleteDistributor_JenisDelivery( $katdel_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE katdel_id = %d",
+				$katdel_id
+			)
+		);
 	}
 
 	public function GetDistributor($id){

@@ -39,7 +39,7 @@ class Onex_Menu_Distributor{
 		$this->table_kategori_menu = "onex_kategori_menu";
 	}
 
-	public function SetAMenuDistributor( $id ){
+	public function SetAMenuDistributor( $menudel_id ){
 		global $wpdb;
 
 		$row =
@@ -47,7 +47,7 @@ class Onex_Menu_Distributor{
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name
 					WHERE id_menudel = %d",
-					$id
+					$menudel_id
 					),
 				ARRAY_A
 				);
@@ -62,6 +62,20 @@ class Onex_Menu_Distributor{
 			$this->distributor = $row['distributor_id'];
 			$this->katmenu = $row['katmenu_id'];
 		}
+	}
+
+	public function GetAllMenu_Kategori($katmenu_id){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+					$wpdb->prepare(
+							"SELECT id_menudel FROM $this->table_name
+							WHERE katmenu_id = %d",
+							$katmenu_id
+						)
+				);
+		return $result;
 	}
 
 	public function GetMenuDistributorList(){
@@ -211,6 +225,48 @@ class Onex_Menu_Distributor{
 		}else{
 			return 'Terjadi Kesalahan.';
 		}
+	}
+
+	public function DeleteMenu(){
+		global $wpdb;
+
+		$result = array( 'status' => false, 'message' => '');
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE id_menudel = %d",
+				$this->id
+			)
+		)){
+			$result['status'] = true;
+			$result['message'] = 'Berhasil menghapus Menu.';
+		}else{
+			$result['message'] = 'Terjadi Kesalahan.';
+		}
+
+		return $result;
+	}
+
+	public function DeleteMenu_Distributor( $deldist_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE distributor_id = %d",
+				$deldist_id
+			)
+		);
+	}
+
+	public function DeleteMenu_Kategori( $katmenu_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE katmenu_id = %d",
+				$katmenu_id
+			)
+		);
 	}
 
 	public function GetHargaMenuDistributor($menudel_id){

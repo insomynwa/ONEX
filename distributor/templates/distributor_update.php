@@ -4,7 +4,11 @@
 	wp_enqueue_media();
 	//var_dump($attributes);
 	$dist_id = $_GET['id'];
-	if( isset($_POST['distributor-update-submit']) ){
+	$isPosted = isset($_POST['distributor-update-submit']);
+	$distributor = $attributes['distributor'];
+	//var_dump($distributor);
+	if( $isPosted ){
+		$dist_id = sanitize_text_field($_POST['distributor-id']);
 		$dist_nama = sanitize_text_field($_POST['distributor-nama']);
 		$dist_alamat = sanitize_text_field($_POST['distributor-alamat']);
 		$dist_telp = sanitize_text_field($_POST['distributor-telp']);
@@ -15,7 +19,7 @@
 		$dist_kode = sanitize_text_field($_POST['distributor-kode']);
 
 		if( $dist_nama != "" && $dist_alamat != "" && !is_null($dist_jenis_delivery) && $dist_kode!="" ){
-			$data = array(
+			/*$data = array(
 					'dist_nama' => $dist_nama,
 					'dist_alamat' => $dist_alamat,
 					'dist_telp' => $dist_telp,
@@ -25,10 +29,54 @@
 					'dist_gambar' => $dist_gambar,
 					'dist_kode' => $dist_kode
 				);
-			if( $dist_gambar!='' ) $data['dist_gambar'] = $dist_gambar;
+			if( $dist_gambar!='' ) $data['dist_gambar'] = $dist_gambar;*/
+			$hasNewAlamat = false;
 
-			$onex_distributor_obj = new Onex_Distributor();
-			$result = $onex_distributor_obj->UpdateDistributor($dist_id, $data);
+			$distributor = new Onex_Distributor();
+			$distributor->SetADistributor( $dist_id);
+			$distributor->SetNama($dist_nama);
+
+			if( $dist_alamat != $distributor->GetAlamat())
+				$hasNewAlamat = true;
+			
+			$distributor->SetAlamat($dist_alamat);
+			$distributor->SetTelp($dist_telp);
+			$distributor->SetKeterangan($dist_keterangan);
+			$distributor->SetKatdel($dist_jenis_delivery);
+			if( $dist_gambar!='') $distributor->SetGambar($dist_gambar);
+			$distributor->SetKode($dist_kode);
+
+			//var_dump($hasNewAlamat, $dist_alamat, $distributor->GetAlamat());
+			$result = $distributor->UpdateDistributor();
+			if($result['status'] && $hasNewAlamat){
+				$ongkir = new Onex_Ongkos_Kirim();
+				$ongkir->SetATarifKirim();
+				$data_pembeli = new Onex_Data_Pembeli();
+				$users = $data_pembeli->GetAll_User_DataPembeli();
+				foreach( $users as $u){
+					$user_id = $u->user_id;
+					$data_pembeli->SetDataPembeliUser( $user_id );
+					$alamat_customer = $data_pembeli->GetAlamatDetail();
+					$alamat_distributor = $distributor->GetAlamat();
+
+					$jarak = $ongkir->GetJarakKm($alamat_distributor, $alamat_customer);
+					$biaya = $ongkir->CountBiayaKirim($jarak);
+
+					$invoice = new Onex_Invoice();
+					$invoice->SetAnActiveInvoice_UserDistributor( $user_id, $dist_id);
+					$invoice->SetJarakKirim($jarak);
+					$invoice->SetBiayaKirim($biaya);
+
+					if( $invoice->UpdateJarakAndBiayaKirim()){
+						$result['status'] = true;
+						$result['message'] = 'Berhasil';
+					}
+				}
+			}
+
+
+			/*$onex_distributor_obj = new Onex_Distributor();
+			$result = $onex_distributor_obj->UpdateDistributor($dist_id, $data);*/
 		}else{
 			$result['status'] = false;
 			$result['message'] = 'Masih ada kolom yang belum diisikan.';
@@ -42,45 +90,43 @@
 	</div>
 	<?php else: ?>
 	<div>
-		<img src="<?php if( !$result['status'] ) echo $attributes['distributor']['gambar_dist']; ?>" />
+		<img src="<?php if(!$isPosted) echo $distributor->GetGambar(); ?>" />
 	</div>
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
 		<p>Nama <strong>*</strong><br />
-			<input type="text" name="distributor-nama" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_nama; }else{ echo $attributes['distributor']['nama_dist']; } ?>" />
+			<input type="text" name="distributor-nama" value="<?php if( !$isPosted) echo $distributor->GetNama(); else echo $dist_nama; ?>" />
 		</p>
 		<p>Gambar<br />
-			<input type="text" name="distributor-gambar-url" id="image_url" class="regular-text" value="<?php if(isset($result)) { if( !$result['status'] ) echo $dist_gambar; }else{ echo $attributes['distributor']['gambar_dist']; } ?>" >
+			<input type="text" name="distributor-gambar-url" id="image_url" class="regular-text" value="<?php if(!$isPosted) echo $distributor->GetGambar(); else echo $dist_gambar; ?>" >
     		<input type="button" name="distributor-gambar-button" id="upload-btn" class="button-secondary" value="Upload Image">
 		</p>
 		<p>Jenis Delivery<br />
-		<?php
-			//$content = get_jenis_delivery();
-			// var_dump($content['kat_del'][1]->id_kat_del);
-			if( sizeof($attributes['katdel'])>0 ):
-		?>
+		<?php if( sizeof($attributes['katdel']) > 0 ): ?>
 			<select name="distributor-jenis-delivery">
-				<?php foreach ( $attributes['katdel'] as $katdel ): ?>
-				<option value="<?php echo $katdel->id_katdel; ?>" <?php if( isset($result) ) { if( !$result['status'] && $dist_jenis_delivery==$katdel->id_katdel ) echo "selected='selected'"; }else{ if( $attributes['distributor']['katdel_id']==$katdel->id_katdel ) echo "selected='selected'";} ?> ><?php echo $katdel->nama_katdel; ?></option>
-				<?php endforeach; ?>
+				<?php for( $i=0; $i < sizeof($attributes['katdel']); $i++ ): ?>
+				<?php $katdel = $attributes['katdel'][$i]; $katdel_id = $katdel->GetId(); ?>
+				<option value="<?php echo $katdel_id; ?>" <?php if( (!$isPosted && $distributor->GetKatdel() == $katdel_id) || ($isPosted && $distributor->GetKatdel()==$katdel_id)) echo 'selected'; ?> ><?php echo $katdel->GetNama(); ?></option>
+				<?php endfor; ?>
 			</select>
 		<?php else: ?>
-			<strong>Belum ada jenis delivery. <a href="">Buat sekarang</a>.</strong>
+			<strong>Belum ada jenis delivery. <a href="<?php echo admin_url('admin.php?page=onex-jenis-delivery-tambah'); ?>">Buat sekarang</a>.</strong>
 		<?php endif; ?>
 		</p>
 		<p>Alamat <strong>*</strong><br />
-			<textarea name="distributor-alamat"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_alamat; }else{ echo $attributes['distributor']['alamat_dist']; } ?></textarea>
+			<textarea name="distributor-alamat"><?php if(!$isPosted) echo $distributor->GetALamat(); else echo $dist_alamat; ?></textarea>
 		</p>
 		<p>No. Telp<br />
-			<input type="text" name="distributor-telp" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_telp; }else{ echo $attributes['distributor']['telp_dist']; } ?>"/>
+			<input type="text" name="distributor-telp" value="<?php if(!$isPosted) echo $distributor->GetTelp(); else echo $dist_telp; ?>"/>
 		</p>
 		<p>Email<br />
-			<input type="text" name="distributor-email" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_email; }else{ echo $attributes['distributor']['email_dist']; } ?>" />
+			<input type="text" name="distributor-email" value="<?php if(!$isPosted) echo $distributor->GetEmail(); else echo $dist_email; ?>" />
 		</p>
 		<p>Keterangan<br />
-			<textarea name="distributor-keterangan"><?php if( isset($result) ) { if( !$result['status'] ) echo $dist_keterangan; }else{ echo $attributes['distributor']['keterangan_dist']; } ?></textarea>
+			<textarea name="distributor-keterangan"><?php if(!$isPosted) echo $distributor->GetKeterangan(); else echo $dist_keterangan; ?></textarea>
 		</p>
 		<p>Kode Invoice <strong>*</strong><br />
-			<input type="text" name="distributor-kode" value="<?php if( isset($result) ) { if( !$result['status'] ) echo $dist_kode; }else{ echo $attributes['distributor']['kode_dist']; } ?>"/>
+			<input type="text" name="distributor-kode" value="<?php if(!$isPosted) echo $distributor->GetKode(); else echo $dist_kode; ?>"/>
+			<input type="hidden" name="distributor-id" value="<?php echo $distributor->GetId(); ?>" />
 		</p>
 		<p>
 			<input type="submit" name="distributor-update-submit" value="Simpan" />

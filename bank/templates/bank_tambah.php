@@ -3,8 +3,8 @@
 	if(isset($_POST['bank-tambah-save'])){
 
 		$bank_nama = sanitize_text_field( $_POST['bank-nama']);
-		$bank_pemilik_rekening = sanitizie_text_field( $_POST['bank-pemilik-rekening']);
-		$bank_no_rekening = sanitizie_text_field( $_POST['bank-no-rekening']);
+		$bank_pemilik_rekening = sanitize_text_field( $_POST['bank-pemilik-rekening']);
+		$bank_no_rekening = sanitize_text_field( $_POST['bank-no-rekening']);
 
 		if(!is_null($bank_nama) && !empty($bank_nama) && $bank_nama!="" &&
 		!is_null($bank_pemilik_rekening) && !empty($bank_pemilik_rekening) && $bank_pemilik_rekening!="" &&

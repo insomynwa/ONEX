@@ -99,6 +99,28 @@ class Onex_Pemesanan_Menu{
 		//return $nilai_menu;
 	}
 
+	public function DeletePesananMenu_Invoice( $invoice_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE invoice_id = %d",
+				$invoice_id
+			)
+		);
+	}
+
+	public function DeletePesananMenu_MenuDelivery( $menudel_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE menudel_id = %d",
+				$menudel_id
+			)
+		);
+	}
+
 	public function GetJumlahPemesananMenuByUser( $user_id){
 		global $wpdb;
 
@@ -154,7 +176,7 @@ class Onex_Pemesanan_Menu{
 		return $row['total_nilai'];
 	}
 
-	public function SetPesananMenu_Id( $id) {
+	public function SetPesananMenu_Id( $pesanan_id) {
 		global $wpdb;
 
 		$row =
@@ -162,7 +184,7 @@ class Onex_Pemesanan_Menu{
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name 
 					WHERE id_pesanan = %d",
-					$id
+					$pesanan_id
 					),
 				ARRAY_A
 				);

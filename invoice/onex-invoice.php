@@ -43,9 +43,68 @@ class Onex_Invoice{
 	public function GetBiayaKirim() { return $this->biaya_kirim; }
 	public function SetBiayaKirim($biaya_kirim) { $this->biaya_kirim = $biaya_kirim; }
 
+	private $status_admin_confirm;
+	public function GetStatusAdminConfirm() { return $this->status_admin_confirm; }
+	public function SetStatusAdminConfirm($status) { $this->status_admin_confirm = $status; }
+
 
 	public function __construct(){
 		$this->table_name = "onex_invoice";
+	}
+
+	public function UpdateBiayaKirim(){
+		global $wpdb;
+
+		if(
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE $this->table_name 
+					SET biaya_kirim_invoice = %d
+					WHERE id_invoice = %d",
+					$this->biaya_kirim,
+					$this->id
+					)
+				)
+			){
+			return true;
+		}
+		return false;
+	}
+
+	public function GetAll_Id_ActiveInvoice_Distributor( $distributor_id){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_invoice FROM $this->table_name
+					WHERE status_aktif_invoice = %d 
+					AND status_user_confirm = %d 
+					AND status_admin_confirm = %d
+					AND distributor_id = %d",
+					1,0,0, $distributor_id
+					)
+				);
+		return $result;
+	}
+
+	public function UpdateJarakAndBiayaKirim(){
+		global $wpdb;
+
+		if(
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE $this->table_name 
+					SET jarak_kirim_invoice = %d, biaya_kirim_invoice = %d
+					WHERE id_invoice = %d",
+					$this->jarak_kirim, $this->biaya_kirim,
+					$this->id
+					)
+				)
+			){
+			return true;
+		}
+		return false;
 	}
 
 	public function DeleteInvoice(){
@@ -64,7 +123,17 @@ class Onex_Invoice{
 		return false;
 	}
 
-	public function SetAnInvoice_Id( $id){
+	public function DeleteInvoice_Distributor( $distributor_id){
+		global $wpdb;
+		$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM $this->table_name WHERE distributor_id = %d",
+					$distributor_id
+					)
+				);
+	}
+
+	public function SetAnInvoice_Id( $invoice_id){
 		global $wpdb;
 
 		$row = 
@@ -72,7 +141,7 @@ class Onex_Invoice{
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name 
 					WHERE id_invoice = %d",
-					$id
+					$invoice_id
 					),
 				ARRAY_A
 				);
@@ -89,7 +158,66 @@ class Onex_Invoice{
 			$this->jam_kirim = $row['jam_kirim_invoice'];
 			$this->jarak_kirim = $row['jarak_kirim_invoice'];
 			$this->biaya_kirim = $row['biaya_kirim_invoice']; 
+			$this->status_admin_confirm = $row['status_admin_confirm'];
 		}
+	}
+
+	public function GetAllActiveInvoice(){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_invoice FROM $this->table_name
+					WHERE status_aktif_invoice = %d 
+					AND status_user_confirm = %d 
+					AND status_admin_confirm = %d",
+					1,0,0
+					)
+				);
+		return $result;
+	}
+
+	public function GetListOfActiveInvoices_User( $user_id){
+		global $wpdb;
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT i.id_invoice FROM $this->table_name i
+						WHERE i.user_id = %d AND i.status_aktif_invoice = %d AND i.status_user_confirm = %d",
+						$user_id, 1, 0
+					)
+				);
+		return $result;
+	}
+
+	public function GetListAllInvoice_User( $user_id){
+		global $wpdb;
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT i.id_invoice FROM $this->table_name i
+						WHERE i.user_id = %d AND i.status_aktif_invoice = %d",
+						$user_id, 1
+					)
+				);
+			//var_dump($result);die;
+		return $result;
+	}
+
+	public function GetPesanan(){
+		global $wpdb;
+		$pemesanan_table = "onex_pemesanan_menu";
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT pm.id_pesanan FROM $pemesanan_table pm
+					WHERE pm.invoice_id = %d",
+					$this->id
+					)
+				);
+		return $result;
 	}
 
 	public function SetAnActiveInvoice_UserDistributor( $user, $distributor){
@@ -98,9 +226,12 @@ class Onex_Invoice{
 			$wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT i.* FROM $this->table_name i
-					WHERE i.user_id = %d AND i.status_aktif_invoice = '%d' AND 
-						i.distributor_id = %d",
-						$user, 1,
+					WHERE i.user_id = %d 
+					AND i.status_aktif_invoice = '%d' 
+					AND i.status_user_confirm = %d 
+					AND i.status_admin_confirm = '%d' 
+					AND i.distributor_id = %d",
+						$user, 1, 0, 0,
 						$distributor
 					),
 				ARRAY_A
@@ -219,24 +350,27 @@ class Onex_Invoice{
 	public function DeactivateInvoice(){
 		global $wpdb;
 
-		$expiredInvoice = $this->getExpiredInvoice();
+		$expiredInvoice = $this->GetExpiredInvoice();
 
 		if(!empty( $expiredInvoice) && !is_null( $expiredInvoice) ){
 
-			foreach ($expiredInvoice as $invoice ){
+			//foreach ($expiredInvoice as $invoice ){
 				$wpdb->query(
 					$wpdb->prepare(
-						"UPDATE $this->table_name 
+						/*"UPDATE $this->table_name 
 						SET status_aktif_invoice = 0
 						WHERE id_invoice = %d",
-						$invoice->id_invoice
+						$invoice->id_invoice*/
+						"DELETE FROM $this->table_name 
+						WHERE status_aktif_invoice = 1 AND tgl_invoice < NOW() - INTERVAL 24 HOUR AND status_user_confirm = 0 AND status_admin_confirm = 0",//WHERE id_invoice = %d",
+						null//$invoice->id_invoice
 						)
 					);
-			}
+			//}
 		}
 	}
 
-	function getExpiredInvoice(){
+	function GetExpiredInvoice(){
 		global $wpdb;
 
 		$attributes = null;

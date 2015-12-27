@@ -7,7 +7,7 @@ class Onex_Bank{
 	function __construct(){
 		$this->table_name = "onex_bank";
 
-		add_action( 'wp_print_scripts', array ($this, 'AjaxBankLoadScripts') );
+		//add_action( 'wp_print_scripts', array ($this, 'AjaxBankLoadScripts') );
 		add_action( 'wp_ajax_AjaxGetBankList', array( $this, 'AjaxLoad_Bank_List') );
 		add_action( 'wp_ajax_AjaxGetBankDetail', array( $this, 'AjaxLoad_Bank_Detail') );
 	}

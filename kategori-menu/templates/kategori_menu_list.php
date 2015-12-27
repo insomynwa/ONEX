@@ -3,7 +3,7 @@
 <?php 
 $nmr = 1;
 if( sizeof($attributes['katmenu']) > 0 ): ?>
-<table>
+<table class="table table-hover table-responsive">
 	<tr><th>No</th>
 		<th>Kategori</th>
 		<th>Distributor</th>

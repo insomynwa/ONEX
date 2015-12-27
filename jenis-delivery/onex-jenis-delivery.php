@@ -22,22 +22,22 @@ class Onex_Jenis_Delivery{
 	public function __construct(){
 		$this->table_name = "onex_kategori_delivery";
 
-		add_action('wp_print_scripts', array( $this, 'AjaxDeliveryLoadScripts'));
-		add_action('wp_ajax_AjaxGetJenisDeliveryList', array( $this, 'AjaxLoad_JenisDelivery_List') );
-		add_action('wp_ajax_AjaxGetJenisDeliveryDetail', array( $this, 'AjaxLoad_JenisDelivery_Detail') );
+		//add_action('wp_print_scripts', array( $this, 'AjaxDeliveryLoadScripts'));
+		// add_action('wp_ajax_AjaxGetJenisDeliveryList', array( $this, 'AjaxLoad_JenisDelivery_List') );
+		//add_action('wp_ajax_AjaxGetJenisDeliveryDetail', array( $this, 'AjaxLoad_JenisDelivery_Detail') );
 	}
 
-	function AjaxDeliveryLoadScripts(){
+	/*function AjaxDeliveryLoadScripts(){
 		wp_localize_script( 'ajax-delivery', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php')) );
-	}
+	}*/
 
-	function AjaxLoad_JenisDelivery_List(){
+	/*function AjaxLoad_JenisDelivery_List(){
 		$attributes['katdel'] = $this->DeliveryList();
 		echo $this->getHtmlTemplate( 'templates/', 'delivery_list', $attributes );
 		wp_die();
-	}
+	}*/
 
-	function AjaxLoad_JenisDelivery_Detail(){
+	/*function AjaxLoad_JenisDelivery_Detail(){
 		if( isset( $_GET['kategori_delivery']) ){
 			$attributes['katdel'] = $this->GetDelivery( $_GET['kategori_delivery'] );
 			$onex_distributor_obj = new Onex_Distributor();
@@ -46,16 +46,16 @@ class Onex_Jenis_Delivery{
 			echo $this->getHtmlTemplate( 'templates/', 'delivery_detail', $attributes );
 		}
 		wp_die();
-	}
+	}*/
 
-	public function SetAJenisDelivery( $id){
+	public function SetAJenisDelivery( $katdel_id){
 		global $wpdb;
 		$row = 
 			$wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name
 					WHERE id_katdel = %d ",
-					$id 
+					$katdel_id 
 					),
 				ARRAY_A
 				);
@@ -67,6 +67,19 @@ class Onex_Jenis_Delivery{
 			$this->keterangan = $row['keterangan_katdel'];
 			$this->template = $row['template_id'];
 		}
+	}
+
+	public function GetAllJenisDelivery(){
+		global $wpdb;
+
+		$result = 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_katdel FROM $this->table_name", null
+				)
+			);
+
+		return $result;
 	}
 
 	public function DeliveryList(){
@@ -147,6 +160,26 @@ class Onex_Jenis_Delivery{
 		}else{
 			return 'Terjadi Kesalahan.';
 		}
+	}
+
+	public function DeleteJenisDelivery(){
+		global $wpdb;
+
+		$result = array( 'status' => false, 'message' => '');
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE id_katdel = %d",
+				$this->id
+			)
+		)){
+			$result['status'] = true;
+			$result['message'] = 'Berhasil menghapus jenis delivery.';
+		}else{
+			$result['message'] = 'Terjadi Kesalahan.';
+		}
+
+		return $result;
 	}
 
 	public function UpdateDelivery($data){

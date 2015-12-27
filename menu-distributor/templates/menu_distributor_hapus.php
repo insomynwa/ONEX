@@ -1,9 +1,13 @@
 <?php
-	$menudel_id = $_GET['menu'];
+	$menudel_id = $attributes->GetId();
 
 	if(isset($_POST['menu-hapus-submit'])){
-		$menu_distributor_obj = new Onex_Menu_Distributor();
-		$message = $menu_distributor_obj->DeleteMenuDistributor( $menudel_id);
+		//$menu_distributor_obj = new Onex_Menu_Distributor();
+		$pemesanan = new Onex_Pemesanan_Menu();
+		$pemesanan->DeletePesananMenu_MenuDelivery( $menudel_id);
+		
+		$result = $attributes->DeleteMenu();
+		$message = $result['message'];
 	}
 	
 ?>
@@ -12,10 +16,11 @@
 <?php if($_POST['menu-hapus-submit']) { ?>
 	<div class="updated"><?php echo $message; ?></div>
 <?php } else { ?>
-	<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['menudel']['nama_menudel']; ?></strong>?</p>
+	<p>Apa anda yakin akan menghapus <strong><?php echo $attributes->GetNama(); ?></strong>?</p>
 	<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 		<p>
-			<input type="submit" name="menu-hapus-submit" value="Ya" />
+			<input type="submit" name="menu-hapus-submit" value="Ya" /><br />
+			<span>(PERINGATAN) proses ini akan menghapus semua pemesanan yang berkaitan dengan menu ini!</span>
 		</p>
 	</form>
 <?php } ?>

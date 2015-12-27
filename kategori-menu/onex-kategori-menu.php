@@ -26,7 +26,7 @@ class Onex_Kategori_Menu{
 		$this->table_name = "onex_kategori_menu";
 		$this->table_distributor = "onex_distributor";
 
-		add_action('wp_print_scripts', array( $this, 'AjaxKategoriMenuLoadScripts') );
+		//add_action('wp_print_scripts', array( $this, 'AjaxKategoriMenuLoadScripts') );
 		add_action('wp_ajax_AjaxGetKategoriMenuList', array( $this, 'AjaxLoad_KategoriMenu_List') );
 	}
 
@@ -40,14 +40,14 @@ class Onex_Kategori_Menu{
 		wp_die();
 	}
 
-	public function SetAKategoriMenu( $id){
+	public function SetAKategoriMenu( $id_katmenu){
 		global $wpdb;
 		$row = 
 			$wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name
 					WHERE id_katmenu = %d ",
-					$id 
+					$id_katmenu 
 					),
 				ARRAY_A
 				);
@@ -59,6 +59,20 @@ class Onex_Kategori_Menu{
 			$this->keterangan = $row['keterangan_katmenu'];
 			$this->distributor = $row['distributor_id'];
 		}
+	}
+
+	public function GetAllKategoriMenu_Distributor( $distributor_id){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+					$wpdb->prepare(
+							"SELECT id_katmenu FROM $this->table_name
+							WHERE distributor_id = %d",
+							$distributor_id
+						)
+				);
+		return $result;
 	}
 
 	/**
@@ -83,6 +97,37 @@ class Onex_Kategori_Menu{
 				);
 
 		return $attributes;
+	}
+
+	public function DeleteKategoriMenu(){
+		global $wpdb;
+
+		$result = array( 'status' => false, 'message' => '');
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE id_katmenu = %d",
+				$this->id
+			)
+		)){
+			$result['status'] = true;
+			$result['message'] = 'Berhasil menghapus Kategori.';
+		}else{
+			$result['message'] = 'Terjadi Kesalahan.';
+		}
+
+		return $result;
+	}
+
+	public function DeleteKategori_Distributor( $deldist_id){
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $this->table_name WHERE distributor_id = %d",
+				$deldist_id
+			)
+		);
 	}
 
 	public function GetKategoriMenuDistributorById( $katmenu_id){
@@ -111,7 +156,7 @@ class Onex_Kategori_Menu{
 	* onex_distributor.php
 	*
 	*/
-	public function GetKategoriByDistributor($distributor_id){
+	public function GetKategoriByDistributor( $distributor_id ){
 		global $wpdb;
 
 		$attributes = null;
@@ -173,21 +218,6 @@ class Onex_Kategori_Menu{
 		}
 
 		return $result;
-	}
-
-	public function DeleteDistributor($id){
-		/*global $wpdb;
-
-		if($wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM $this->table_name WHERE id_dist = %d",
-				$id
-			)
-		)){
-			return 'Berhasil menghapus Distributor.';
-		}else{
-			return 'Terjadi Kesalahan.';
-		}*/
 	}
 
 	public function GetKategoriMenuById($id){

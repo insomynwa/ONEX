@@ -8,14 +8,14 @@ promo
 message
 invoice
 filter input harga/telp..
-harga satuan menu di pemesanan
+hapus page jika jenis delivery dihapus
 
 
+harga satuan menu di pemesanan DONE
 kode invoice DONE
 pesan nembak ke login.. DONE
 update detail plugin OTW DONE
 subtotal + tax DONE
 -"pesan sekarang" disable DONE
 
-update DB ongkir hapus
-create DB biaya_kirim
+add new column status_admin_confirm default 0 tinyint(1)

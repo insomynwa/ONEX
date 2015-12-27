@@ -6,7 +6,7 @@
 <script type="text/javascript">
 	jQuery(document).ready( function($){
 		var data = {
-			action: 'AjaxGetJenisDeliveryList'
+			action: 'AjaxRetrieveJenisDeliveryList'
 		};
 
 		$.get(ajax_one_express.ajaxurl, data, function(response){

@@ -1,10 +1,27 @@
 <?php
-	$dist_id = $_GET['id'];
+	$dist_id = $attributes->GetId();
 	$dist_nama = "";
 
 	if(isset($_POST['dist_hapus_submit'])){
-		$onex_distributor_obj = new Onex_Distributor();
-		$message = $onex_distributor_obj->DeleteDistributor($dist_id);
+		//$distributor = $attributes;//new Onex_Distributor();
+		$katmenu = new Onex_Kategori_Menu();
+		$menudel = new Onex_Menu_Distributor();
+		$invoice = new Onex_Invoice();
+
+		$katmenu->DeleteKategori_Distributor( $dist_id);
+		$menudel->DeleteMenu_Distributor( $dist_id);
+		$deleted_invoice = $invoice->GetAll_Id_ActiveInvoice_Distributor( $dist_id);
+		if( !is_null($deleted_invoice) && !empty($deleted_invoice)){
+			$pemesanan = new Onex_Pemesanan_Menu();
+			foreach( $deleted_invoice as $delin){
+				$delin_id = $delin->id_invoice;
+				$pemesanan->DeletePesananMenu_Invoice( $delin_id);
+			}
+			$invoice->DeleteInvoice_Distributor( $dist_id);
+		}
+		//$distributor->SetADistributor( $dist_id);
+		$result = $attributes->DeleteDistributor();
+		$message = $result['message'];
 
 	}
 	
@@ -14,10 +31,11 @@
 	<?php if($_POST['dist_hapus_submit']) { ?>
 		<div class="updated"><?php echo $message; ?></div>
 	<?php } else { ?>
-		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes['distributor']['nama_dist']; ?></strong>?</p>
+		<p>Apa anda yakin akan menghapus <strong><?php echo $attributes->GetNama(); ?></strong>?</p>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<p>
-				<input type="submit" name="dist_hapus_submit" value="Ya" />
+				<input type="submit" name="dist_hapus_submit" value="Ya" /><br />
+				<span>(PERINGATAN) proses ini akan menghapus semua kategori, menu, dan pemesanan yang berkaitan dengan distributor ini!</span>
 			</p>
 		</form>
 	<?php } ?>
