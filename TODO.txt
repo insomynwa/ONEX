@@ -1,9 +1,8 @@
-pagination menu
+pagination
 checkout
 lokasi
 payment
 tax
-bank
 promo
 message
 invoice
@@ -17,5 +16,9 @@ pesan nembak ke login.. DONE
 update detail plugin OTW DONE
 subtotal + tax DONE
 -"pesan sekarang" disable DONE
+bank DONE
+pagination menu list DONE
 
-add new column status_admin_confirm default 0 tinyint(1)
+tbl invoice add bank, mode kirim, tgl usr confirm, tgl admin confirm, status kirim
+add htaccess wp-content
+mod root htaccess

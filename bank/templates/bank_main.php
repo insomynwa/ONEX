@@ -6,7 +6,7 @@
 <script type="text/javascript">
 	jQuery(document).ready( function($){
 		var data = {
-			action: 'AjaxGetBankList'
+			action: 'AjaxRetrieveBankList'
 		};
 
 		$.get(ajax_one_express.ajaxurl, data, function(response){

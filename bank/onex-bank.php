@@ -4,29 +4,66 @@ class Onex_Bank{
 
 	private $table_name;
 
+	private $id;
+	public function GetId(){ return $this->id; }
+
+	private $nama;
+	public function GetNama() { return $this->nama; }
+	public function SetNama( $nama ) { $this->nama = $nama; }
+	
+	private $pemilik;
+	public function GetPemilik() { return $this->pemilik; }
+	public function SetPemilik($pemilik) { $this->pemilik = $pemilik; }
+
+	private $no_rekening;
+	public function GetNoRekening() { return $this->no_rekening; }
+	public function SetNoRekening($no_rekening) { $this->no_rekening = $no_rekening; }
+
+
 	function __construct(){
 		$this->table_name = "onex_bank";
 
 		//add_action( 'wp_print_scripts', array ($this, 'AjaxBankLoadScripts') );
-		add_action( 'wp_ajax_AjaxGetBankList', array( $this, 'AjaxLoad_Bank_List') );
-		add_action( 'wp_ajax_AjaxGetBankDetail', array( $this, 'AjaxLoad_Bank_Detail') );
+		/*add_action( 'wp_ajax_AjaxGetBankList', array( $this, 'AjaxLoad_Bank_List') );
+		add_action( 'wp_ajax_AjaxGetBankDetail', array( $this, 'AjaxLoad_Bank_Detail') );*/
 	}
 
-	function AjaxBankLoadScripts(){
+	/*function AjaxBankLoadScripts(){
 		wp_localize_script( 'ajax-bank', 'ajax_one_express', array( 'ajaxurl' => admin_url('admin-ajax.php')) );
-	}
+	}*/
 
-	function AjaxLoad_Bank_List(){
+	/*function AjaxLoad_Bank_List(){
 		$attributes['bank'] = $this->GetBankAll();
 		echo $this->getHtmlTemplate( plugin_dir_path( __FILE__ ) .'/templates/', 'bank_list', $attributes );
 		wp_die();
+	}*/
+
+	/*function AjaxLoad_Bank_Detail(){
+
+	}*/
+
+	public function SetABank_Id( $bank_id){
+		global $wpdb;
+		$row = 
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE id_bank = %d ",
+					$bank_id 
+					),
+				ARRAY_A
+				);
+		
+		$this->id = 0;
+		if( !is_null($row )) {
+			$this->id = $row['id_bank'];
+			$this->nama = $row['nama_bank'];
+			$this->pemilik = $row['pemilik_rekening'];
+			$this->no_rekening = $row['no_rekening'];
+		}
 	}
 
-	function AjaxLoad_Bank_Detail(){
-
-	}
-
-	private function getHtmlTemplate( $location, $template_name, $attributes = null ){
+	/*private function getHtmlTemplate( $location, $template_name, $attributes = null ){
 		if(! $attributes) $attributes = array();
 
 		ob_start();
@@ -34,9 +71,9 @@ class Onex_Bank{
 		$html = ob_get_contents();
 		ob_end_clean();
 		echo $html;
-	}
+	}*/
 
-	public function GetBankAll(){
+	/*public function GetBankAll(){
 		global $wpdb;
 		$attributes = null;
 
@@ -48,6 +85,42 @@ class Onex_Bank{
 				);
 
 		return $attributes;
+	}*/
+
+	public function GetAllBank(){
+		global $wpdb;
+
+		$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_bank FROM $this->table_name",
+						null
+					)
+				);
+
+		return $result;
+	}
+
+	public function AddNewBank(){
+		global $wpdb;
+
+		$result = array('status'=>false, 'message' =>'');
+
+		if( $wpdb->insert(
+				$this->table_name,
+				array(
+					'nama_bank' => $this->nama,
+					'pemilik_rekening' => $this->pemilik,
+					'no_rekening' => $this->no_rekening
+				),
+				array('%s','%s','%s')
+			)
+		){
+			$result['status'] = true;
+			$result['message'] = "Berhasil menambah bank.";
+		}else{
+			$result['message'] = "Terjadi kesalahan.";
+		}
+		return $result;
 	}
 
 	public function AddBank( $data){
@@ -73,53 +146,56 @@ class Onex_Bank{
 		return $result;
 	}
 
-	public function UpdateBank($id, $data){
+	public function UpdateBank(){
 		global $wpdb;
 
 		$result = array(
 					'status' => false,
 					'message' => ''
 				);
-		/*if ($data['dist_gambar'] == '' ) $data['dist_gambar'] = 'NOIMAGE';
+		/*if ($data['dist_gambar'] == '' ) $data['dist_gambar'] = 'NOIMAGE';*/
 
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'nama' => $data['dist_nama'],
-				'alamat' => $data['dist_alamat'],
-				'kategori_delivery' => $data['dist_jenis_delivery'],
-				'telp' => $data['dist_telp'],
-				'email' => $data['dist_email'],
-				'keterangan' => $data['dist_keterangan'],
-				'gambar' => $data['dist_gambar']
+				'nama_bank' => $this->nama,
+				'pemilik_rekening' => $this->pemilik,
+				'no_rekening' => $this->no_rekening
 			),
-			array('id_dist' => $id),
-			array('%s','%s'),
+			array('id_bank' => $this->id),
+			array('%s','%s', '%s'),
 			array('%d')
 		)){
 			$result['status'] = true;
-			$result['message'] = 'Distributor berhasil diperbaharui.';
+			$result['message'] = 'Bank berhasil diperbaharui.';
 		}else{
-			$result['status'] = true;
-			$result['message'] = 'Tidak ada pembaharuan distributor.';
+			$result['status'] = false;
+			$result['message'] = 'Terjadi kesalahan.';
 		}
 
-		return $result;*/
+		return $result;
 	}
 
-	public function DeleteBank($id){
-		/*global $wpdb;
+	public function DeleteBank(){
+		global $wpdb;
+
+		$result = array(
+					'status' => false,
+					'message' => ''
+				);
 
 		if($wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM $this->table_name WHERE id_dist = %d",
-				$id
+				"DELETE FROM $this->table_name WHERE id_bank = %d",
+				$this->id
 			)
 		)){
-			return 'Berhasil menghapus Distributor.';
+			$result['status'] = true;
+			$result['message'] = 'Berhasil menghapus Bank.';
 		}else{
-			return 'Terjadi Kesalahan.';
-		}*/
+			$result['message'] = 'Terjadi Kesalahan.';
+		}
+		return $result;
 	}
 
 	public function GetBankById($id){

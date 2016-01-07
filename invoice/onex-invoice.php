@@ -47,6 +47,30 @@ class Onex_Invoice{
 	public function GetStatusAdminConfirm() { return $this->status_admin_confirm; }
 	public function SetStatusAdminConfirm($status) { $this->status_admin_confirm = $status; }
 
+	private $bank;
+	public function GetBank() { return $this->bank; }
+	public function SetBank($bank) { $this->bank = $bank; }
+
+	private $tipe_bayar;
+	public function GetTipeBayar() { return $this->tipe_bayar; }
+	public function SetTipeBayar($tipe_bayar) { $this->tipe_bayar = $tipe_bayar; }
+
+	private $tgl_user_confirm;
+	public function GetTanggalUserConfirm() { return $this->tgl_user_confirm; }
+	public function SetTanggalUserConfirm() { 
+		date_default_timezone_set('Asia/Jakarta');
+		$dtime = date("Y-m-d H:i:s");
+		$this->tgl_user_confirm = $dtime; 
+	}
+
+	private $tgl_admin_confirm;
+	public function GetTanggalAdminConfirm() { return $this->tgl_admin_confirm; }
+	//public function SetTanggalAdminConfirm($tgl_admin_confirm) { $this->tgl_admin_confirm = $tgl_admin_confirm; }
+
+	private $status_kirim;
+	public function GetStatusKirim() { return $this->status_kirim; }
+	public function SetStatusKirim($status_kirim) { $this->status_kirim = $status_kirim; }
+
 
 	public function __construct(){
 		$this->table_name = "onex_invoice";
@@ -69,6 +93,32 @@ class Onex_Invoice{
 			return true;
 		}
 		return false;
+	}
+
+	public function KonfirmasiPembayaran(){
+		global $wpdb;
+
+		$result = array('status'=>false, 'message' =>'');
+
+		if( $wpdb->update(
+			$this->table_name,
+			array(
+				'status_user_confirm' => $this->status_confirm,
+				'jam_kirim_invoice' => $this->jam_kirim,
+				'bank_id' => $this->bank,
+				'tipe_bayar' => $this->tipe_bayar,
+				'tgl_user_confirm' => $this->tgl_user_confirm
+			),
+			array('id_invoice' => $this->id),
+			array('%d','%s', '%d', '%d', '%s'),
+			array('%d')
+		)){
+			$result['status'] = true;
+			$result['message'] = "Pembayaran Berhasil.";
+		}else{
+			$result['message'] = "Gagal.";
+		}
+		return $result;
 	}
 
 	public function GetAll_Id_ActiveInvoice_Distributor( $distributor_id){
@@ -158,7 +208,12 @@ class Onex_Invoice{
 			$this->jam_kirim = $row['jam_kirim_invoice'];
 			$this->jarak_kirim = $row['jarak_kirim_invoice'];
 			$this->biaya_kirim = $row['biaya_kirim_invoice']; 
+			$this->tipe_bayar = $row['tipe_bayar'];
+			$this->bank = $row['bank_id'];
 			$this->status_admin_confirm = $row['status_admin_confirm'];
+			$this->tgl_user_confirm = $row['tgl_user_confirm'];
+			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
+			$this->status_kirim = $row['status_kirim'];
 		}
 	}
 
@@ -178,14 +233,84 @@ class Onex_Invoice{
 		return $result;
 	}
 
+	public function GetAllConfirmedInvoiceUser(){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_invoice FROM $this->table_name
+					WHERE status_aktif_invoice = %d 
+					AND status_user_confirm = %d 
+					AND status_admin_confirm = %d ORDER BY tgl_invoice ASC",
+					1,1,0
+					)
+				);
+		return $result;
+	}
+
+	public function GetLimitInvoice_Status( $status = "unconfirmed", $limit, $offset ){
+		$user_confirm = 0;
+		$admin_confirm = 0;
+		if( $status == "unconfirmed" ){
+			$user_confirm = 1;
+			$admin_confirm = 0;
+		}else if( $status == "confirmed") {
+			$user_confirm = 1;
+			$admin_confirm = 1;
+		}
+		global $wpdb;
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id_invoice FROM $this->table_name
+					WHERE status_user_confirm = %d 
+					AND status_admin_confirm = %d 
+					ORDER BY jam_kirim_invoice ASC
+					LIMIT %d, %d",
+					$user_confirm, $admin_confirm,
+					$offset, $limit
+					)
+				);
+
+		return $result;
+	}
+
+	public function CountInvoiceStatus($status="unconfirmed") {
+		$user_confirm = 0;
+		$admin_confirm = 0;
+		if( $status == "unconfirmed" ){
+			$user_confirm = 1;
+			$admin_confirm = 0;
+		}else if( $status == "confirmed") {
+			$user_confirm = 1;
+			$admin_confirm = 1;
+		}
+
+		global $wpdb;
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
+					WHERE status_user_confirm = %d 
+					AND status_admin_confirm = %d",
+					$user_confirm, $admin_confirm
+					),
+					ARRAY_A
+				);
+		//var_dump($status, $user_confirm, $admin_confirm, $row['jumlah']);
+		return $row['jumlah'];
+	}
+
 	public function GetListOfActiveInvoices_User( $user_id){
 		global $wpdb;
 		$result =
 			$wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT i.id_invoice FROM $this->table_name i
-						WHERE i.user_id = %d AND i.status_aktif_invoice = %d AND i.status_user_confirm = %d",
-						$user_id, 1, 0
+						WHERE i.user_id = %d AND i.status_aktif_invoice = %d AND i.status_user_confirm = %d AND i.status_admin_confirm = %d",
+						$user_id, 1, 0, 0
 					)
 				);
 		return $result;
@@ -201,7 +326,6 @@ class Onex_Invoice{
 						$user_id, 1
 					)
 				);
-			//var_dump($result);die;
 		return $result;
 	}
 
@@ -249,10 +373,15 @@ class Onex_Invoice{
 			$this->jam_kirim = $row['jam_kirim_invoice'];
 			$this->jarak_kirim = $row['jarak_kirim_invoice'];
 			$this->biaya_kirim = $row['biaya_kirim_invoice']; 
+			$this->bank = $row['bank_id'];
+			$this->tipe_bayar = $row['tipe_bayar'];
+			$this->tgl_user_confirm = $row['tgl_user_confirm'];
+			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
+			$this->status_kirim = $row['status_kirim'];
 		}
 	}
 
-	public function CreateInvoice( $user_id, $invoice_data){
+	/*public function CreateInvoice( $user_id, $invoice_data){
 		global $wpdb;
 
 		$no_invoice = $this->generateNomorInvoice();
@@ -270,12 +399,11 @@ class Onex_Invoice{
 			return $wpdb->insert_id;
 		}
 		return 0;
-	}
+	}*/
 
 	public function CreateNewInvoice(){
 		global $wpdb;
 
-		//$no_invoice = $this->generateNomorInvoice();
 		if($wpdb->insert(
 				$this->table_name,
 				array(
@@ -405,21 +533,36 @@ class Onex_Invoice{
 
 	private function generateNomorInvoice(){
 		date_default_timezone_set('Asia/Jakarta');
-		$tahun = date('Y');
+		/*$tahun = date('Y');
 		$tahun %= 2000;
-		$bulan = date('n');
-		$tgl = date('j');
-		$jam = date('G');
+		$bulan = date('n');*/
+		$tgl = date('d');
+		/*$jam = date('G');
 		$minutes = intval(date('i'));
 		$seconds = intval(date('s'));
-		$nomor = $tahun+$bulan+$tgl+$jam+$minutes+$seconds;
+		$nomor = $tahun+$bulan+$tgl+$jam+$minutes+$seconds;*/
+		$nomor = $tgl.''.($this->countInvoiceUser_Distributor() + 1);
+		/*if($nomor<10) $nomor = "00". $nomor;
+		else if( $nomor < 100) $nomor = "0" . $nomor;*/
 
-		//var_dump($tahun,$bulan,$tgl, $jam);
-
-		//$kode_katdel = $this->GetKodeJenisDelivery($menudel_id);
-
-		$kode = "$nomor";//"$kode_katdel$user_id$nomor";
+		$kode = "$nomor";
 		return $kode;
+	}
+
+	private function countInvoiceUser_Distributor(){
+		global $wpdb;
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
+					WHERE user_id = %d AND distributor_id = %d",
+					$this->user, $this->distributor
+					),
+					ARRAY_A
+				);
+
+		return $row['jumlah'];
 	}
 
 	private function GetKodeJenisDelivery($menudel_id){

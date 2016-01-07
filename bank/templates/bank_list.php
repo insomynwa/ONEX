@@ -1,5 +1,5 @@
 <a href='<?php echo admin_url('admin.php?page=onex-bank-tambah'); ?>' >Tambah</a>
-<table>
+<table class="table table-hover table-responsive">
 	<tr><th>No</th>
 		<th>Bank</th>
 		<th>Atas Nama</th>
@@ -8,25 +8,26 @@
 	</tr>
 	<?php 
 		$nmr = 1;
-		if( count($attributes['bank']) > 0 ): ?>
-		<?php foreach($attributes['bank'] as $bank ): ?>
+		if( sizeof($attributes['bank']) > 0 ): ?>
+		<?php for($i=0; $i < sizeof($attributes['bank']); $i++ ): ?>
+			<?php $bank = $attributes['bank'][$i]; ?>
 			<tr>
 				<td><?php echo $nmr; ?></td>
-				<td><?php echo $bank->nama_bank; ?></td>
-				<td><?php echo $bank->pemilik_rekening; ?></td>
-				<td><?php echo $bank->no_rekening; ?></td>
+				<td><?php echo $bank->GetNama(); ?></td>
+				<td><?php echo $bank->GetPemilik(); ?></td>
+				<td><?php echo $bank->GetNoRekening(); ?></td>
 				<td>
-					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-hapus&id='. $bank->id_bank); ?>'>Hapus</a> | 
-					<a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-update&id='. $bank->id_bank); ?>'>Update</a>
+					<a href='<?php echo admin_url('admin.php?page=onex-bank-hapus&id='. $bank->GetId()); ?>'>Hapus</a> | 
+					<a href='<?php echo admin_url('admin.php?page=onex-bank-update&id='. $bank->GetId()); ?>'>Update</a>
 				</td>
 			</tr>
 			<?php $nmr += 1; ?>
-		<?php endforeach; ?>
+		<?php endfor; ?>
 	<?php endif; ?>
 </table>
 <a href='<?php echo admin_url('admin.php?page=onex-bank-tambah'); ?>' >Tambah</a>
 <script type="text/javascript">
-	jQuery(document).ready( function($) {
+	/*jQuery(document).ready( function($) {
 
 		$(".katdel-detail-link").click(function(){
 			var id_katdel = (this.id).split("_").pop();
@@ -43,5 +44,5 @@
 
 		});
 
-	});
+	});*/
 </script>

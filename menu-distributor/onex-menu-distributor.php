@@ -119,22 +119,51 @@ class Onex_Menu_Distributor{
 		return $attributes;
 	}
 
-	public function GetMenuByKategori( $katmenu_id ){
+	public function CountMenu_Kategori( $katmenu_id){
 		global $wpdb;
 
-		$attributes = null;
-		$attributes =
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(id_menudel) AS jumlah FROM $this->table_name
+					WHERE katmenu_id = %d",
+					$katmenu_id
+					),
+					ARRAY_A
+				);
+
+		return $row['jumlah'];
+	}
+
+	public function GetLimitMenu_Kategori( $katmenu_id, $limit, $offset ){
+		global $wpdb;
+
+		$result =
 			$wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name
-					WHERE katmenu_id = %d",
+					WHERE katmenu_id = %d LIMIT %d, %d",
+					$katmenu_id, $offset, $limit
+					)
+				);
+
+		return $result;
+	}
+
+	/*public function GetMenuByKategori( $katmenu_id ){
+		global $wpdb;
+
+		$result =
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM $this->table_name
+					WHERE katmenu_id = %d ",
 					$katmenu_id
 					)
 				);
-		//var_dump($attributes);
 
-		return $attributes;
-	}
+		return $result;
+	}*/
 
 	/*public function AddKategoriMenu($data){
 		global $wpdb;

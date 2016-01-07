@@ -48,6 +48,10 @@ class Onex_Plugin{
 		add_action('wp_ajax_AjaxRetrieveDistributorDetail', array( $this, 'AjaxRetrieve_Distributor_Detail')) ;
 		add_action('wp_ajax_AjaxAddDistributor', array( $this, 'AjaxAdd_Distributor')) ;
 		add_action('wp_ajax_AjaxUpdateTarifKirim', array( $this, 'AjaxUpdate_TarifKirim'));
+		add_action('wp_ajax_AjaxRetrieveBankList', array( $this, 'AjaxRetrieve_Bank_List') );
+		add_action('wp_ajax_AjaxRetrievePemesananList', array( $this, 'AjaxRetrieve_Pemesanan_List') );
+		add_action('wp_ajax_AjaxRetrieveInvoiceDetail', array( $this, 'AjaxRetrieve_Invoice_Detail') );
+		add_action('wp_ajax_AjaxRetrievePagination', array( $this, 'AjaxRetrieve_Pagination') );
 
 		//add_action('wp_enqueue_scripts', array( $this, 'load_plugin_styles'));
 	}
@@ -71,7 +75,7 @@ class Onex_Plugin{
 	function load_onex_scripts(){
 		wp_enqueue_media();
 
-		wp_register_script("otw-scripts", plugin_dir_url(__FILE__).'/js/one-express.js');
+		wp_register_script("otw-scripts", plugin_dir_url(__FILE__).'js/one-express.js');
 		wp_register_script("bootstrapminjs", get_template_directory_uri().'/css/bootstrap/js/bootstrap.min.js');
 		wp_register_style("bootstrapmincss", get_template_directory_uri().'/css/bootstrap/css/bootstrap.min.css');
 
@@ -80,8 +84,6 @@ class Onex_Plugin{
 		wp_enqueue_style("bootstrapmincss");
 
 		wp_localize_script( "otw-scripts", "ajax_one_express", array('ajaxurl'=>admin_url('admin-ajax.php')) );
-		//wp_enqueue_script( "ajax-distributor", plugin_dir_url( __FILE__ ) . '../js/ajax-distributor.js', array( 'jquery' ) );
-		//wp_localize_script( 'ajax-distributor', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 	}
 
 	function AjaxRetrieve_JenisDelivery_List(){
@@ -126,11 +128,11 @@ class Onex_Plugin{
 		$distributor_all = $this->onex_distributor_obj->GetAllDistributor();
 		$attributes = array();
 		$nmr = 0;
-		//var_dump($distributor_all);
+		
 		foreach( $distributor_all as $d){
 			$distributor_id = $d->id_dist;
 			$distributor = new Onex_Distributor();
-			$distributor->SetADistributor( $distributor_id);//var_dump($distributor->GetNama());
+			$distributor->SetADistributor( $distributor_id);
 			$attributes['distributor'][$nmr] = $distributor;
 
 			$katdel = new Onex_Jenis_Delivery();
@@ -214,6 +216,119 @@ class Onex_Plugin{
 		wp_die();
 	}
 
+	function AjaxRetrieve_Bank_List(){
+		$bank_all = $this->onex_bank_obj->GetAllBank();
+		$attributes = array();
+		$nmr = 0;
+		
+		foreach( $bank_all as $b){
+			$bank_id = $b->id_bank;
+			$bank = new Onex_Bank();
+			$bank->SetABank_Id( $bank_id);
+			$attributes['bank'][$nmr] = $bank;
+			$nmr += 1;
+		}
+		echo $this->getHtmlTemplate( 'bank/templates/', 'bank_list', $attributes );
+		wp_die();
+	}
+
+	function AjaxRetrieve_Pemesanan_List(){
+		if( isset( $_GET['page']) && $_GET['page']!="" && isset( $_GET['status']) && $_GET['status']!="" ){
+			$get_page = sanitize_text_field( $_GET['page']);
+			$get_status = sanitize_text_field( $_GET['status']);
+
+			$limit = 3;
+			$offset = ( $get_page - 1) * $limit;
+
+			$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $get_status, $limit, $offset);
+
+			$data= array();
+
+			$nmr = 0;
+			foreach( $invoices as $i){
+				$invoice_id = $i->id_invoice;
+
+				$invoice = new Onex_Invoice();
+				$pemesanan = new Onex_Pemesanan_Menu();
+				$distributor = new Onex_Distributor();
+				$bank = new Onex_Bank();
+
+				$invoice->SetAnInvoice_Id( $invoice_id);
+				$attributes['invoice'][$nmr] = $invoice;
+				$distributor->SetADistributor( $invoice->GetDistributor());
+				$attributes['distributor'][$nmr] = $distributor;
+				$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+				$bank->SetABank_Id( $invoice->GetBank());
+				$attributes['bank'][$nmr] = $bank;
+				$nmr += 1;
+			}
+			
+			echo $this->getHtmlTemplate(  'pemesanan/templates/', 'pemesanan_list', $attributes);
+		}
+
+		
+		wp_die();
+	}
+
+	function AjaxRetrieve_Pagination(){
+		if( isset($_GET['status']) && $_GET['status'] != "" ){
+			$get_status = sanitize_text_field( $_GET['status']);
+
+			if( $get_status == "unconfirmed") {
+				$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $get_status);
+				$limit = 3;
+				$jumlah_page = intval($jumlah_data / $limit);
+				if( $jumlah_data % $limit > 0)
+					$jumlah_page += 1;
+				//var_dump($jumlah_data, $jumlah_page);
+				$data['jumlah_page'] = $jumlah_page;
+				$data['status'] = $get_status;
+			}
+			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_list_pagination', $data );
+		}
+		wp_die();
+	}
+
+	function AjaxRetrieve_Invoice_Detail(){
+
+		if( isset($_GET['invoice'] ) && $_GET['invoice'] != "" ) {
+			$get_invoice_id = sanitize_text_field( $_GET['invoice'] );
+
+			$invoice = new Onex_Invoice();
+			$distributor = new Onex_Distributor();
+			$data_pelanggan = new Onex_Data_Pembeli();
+			$invoice->SetAnInvoice_Id( $get_invoice_id);
+			$distributor->SetADistributor( $invoice->GetDistributor() );
+			$data_pelanggan->SetDataPembeliUser( $invoice->GetUser() );
+			$data = array();
+			$data['invoice'] = $invoice;
+			$data['distributor'] = $distributor;
+			$data['data_pelanggan'] = $data_pelanggan;
+
+			$list_pesanan = $invoice->GetPesanan();
+			$n = 0;
+			foreach( $list_pesanan as $p){
+				$pesanan_id = $p->id_pesanan;
+				$pesanan = new Onex_Pemesanan_Menu();
+				$pesanan->SetPesananMenu_Id( $pesanan_id);
+				$data['pesanan'][$n] = $pesanan;
+				$menudel = new Onex_Menu_Distributor();
+				$menudel->SetAMenuDistributor( $pesanan->GetMenudel() );
+				$data['menu'][$n] = $menudel;
+				$n += 1;
+			}
+			//var_dump($data['menu']);
+			$pemesanan = new Onex_Pemesanan_Menu();
+			$total_nilai_menu = $pemesanan->GetTotalNilaiPesanan( $get_invoice_id);
+			$total_nilai_menu_ppn = $total_nilai_menu + ( $total_nilai_menu * 0.05 );
+			$total_pembayaran = $total_nilai_menu_ppn + $invoice->GetBiayaKirim();
+			$data['total_pembayaran'] = $total_pembayaran;
+
+			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_detail_invoice', $data );
+		}
+		wp_die();
+	}
+
 	public function create_menu(){
 		// MAIN MENU *************************
 		add_menu_page(
@@ -242,7 +357,7 @@ class Onex_Plugin{
 			'Tambah Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-tambah',
-			array( $this, 'RenderDeliveryTambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderDeliveryTambah')
 		);
 		add_submenu_page(
 			null,
@@ -250,7 +365,7 @@ class Onex_Plugin{
 			'Hapus Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-hapus',
-			array( $this, 'RenderDeliveryHapus')//'onex_jenis_delivery_hapus'
+			array( $this, 'RenderDeliveryHapus')
 		);
 		add_submenu_page(
 			null,
@@ -258,7 +373,7 @@ class Onex_Plugin{
 			'Update Jenis Delivery',
 			'manage_options',
 			'onex-jenis-delivery-update',
-			array( $this, 'RenderDeliveryUpdate')//'onex_jenis_delivery_update'
+			array( $this, 'RenderDeliveryUpdate')
 		);
 
 		// Sub MENU "DISTRIBUTOR" ************
@@ -268,7 +383,7 @@ class Onex_Plugin{
 			'Distributor',
 			'manage_options',
 			'onex-distributor-page',
-			array( $this, 'RenderDistributorList')//'onex_distributor_page'
+			array( $this, 'RenderDistributorList')
 		);
 		add_submenu_page(
 			null,
@@ -276,7 +391,7 @@ class Onex_Plugin{
 			'Tambah Distributor',
 			'manage_options',
 			'onex-distributor-tambah',
-			array( $this, 'RenderDistributorTambah')//'onex_distributor_tambah'
+			array( $this, 'RenderDistributorTambah')
 		);
 		add_submenu_page(
 			null,
@@ -284,7 +399,7 @@ class Onex_Plugin{
 			'Update Distributor',
 			'manage_options',
 			'onex-distributor-update',
-			array( $this, 'RenderDistributorUpdate')//'onex_distributor_update'
+			array( $this, 'RenderDistributorUpdate')
 		);
 		add_submenu_page(
 			null,
@@ -292,7 +407,7 @@ class Onex_Plugin{
 			'Hapus Distributor',
 			'manage_options',
 			'onex-distributor-hapus',
-			array( $this, 'RenderDistributorHapus')//'onex_distributor_hapus'
+			array( $this, 'RenderDistributorHapus')
 		);
 
 		// Sub MENU KATEGORI MENU
@@ -310,7 +425,7 @@ class Onex_Plugin{
 			'Tambah Kategori Menu',
 			'manage_options',
 			'onex-kategori-menu-tambah',
-			array( $this, 'RenderKategoriMenuTambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderKategoriMenuTambah')
 		);
 		add_submenu_page(
 			null,
@@ -318,7 +433,7 @@ class Onex_Plugin{
 			'Update Kategori Menu',
 			'manage_options',
 			'onex-kategori-menu-update',
-			array( $this, 'RenderKategoriMenuUpdate')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderKategoriMenuUpdate')
 		);
 		add_submenu_page(
 			null,
@@ -326,7 +441,7 @@ class Onex_Plugin{
 			'Hapus Kategori Menu',
 			'manage_options',
 			'onex-kategori-menu-hapus',
-			array( $this, 'RenderKategoriMenuHapus')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderKategoriMenuHapus')
 		);
 
 		// Sub MENU "MENU DISTRIBUTOR"
@@ -344,7 +459,7 @@ class Onex_Plugin{
 			'Tambah Menu Distributor',
 			'manage_options',
 			'onex-menu-distributor-tambah',
-			array( $this, 'RenderMenuDistributorTambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderMenuDistributorTambah')
 		);
 		add_submenu_page(
 			null,
@@ -378,7 +493,7 @@ class Onex_Plugin{
 			'Tambah Menu Distributor',
 			'manage_options',
 			'onex-menu-distributor-tambah',
-			array( $this, 'RenderMenuDistributorTambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderMenuDistributorTambah')
 		);*/
 
 		// Sub Tarif Pengiriman
@@ -392,21 +507,37 @@ class Onex_Plugin{
 		);
 
 		// Sub MENU "BANK" **********************
-		/*add_submenu_page(
+		add_submenu_page(
 			'onex-main-page',
 			'Bank',
 			'Bank',
 			'manage_options',
 			'onex-bank-page',
 			array( $this, 'RenderBankList')
-		);*/
+		);
 		add_submenu_page(
 			null,
 			'Tambah Bank',
 			'Tambah Bank',
 			'manage_options',
 			'onex-bank-tambah',
-			array( $this, 'RenderBankTambah')//'onex_jenis_delivery_tambah'
+			array( $this, 'RenderBankTambah')
+		);
+		add_submenu_page(
+			null,
+			'Hapus Bank',
+			'Hapus Bank',
+			'manage_options',
+			'onex-bank-hapus',
+			array( $this, 'RenderBankHapus')
+		);
+		add_submenu_page(
+			null,
+			'Update Bank',
+			'Update Bank',
+			'manage_options',
+			'onex-bank-update',
+			array( $this, 'RenderBankUpdate')
 		);
 
 		// Sub MENU "PROMO" ****************
@@ -418,13 +549,26 @@ class Onex_Plugin{
 			'onex-promo-page',
 			array( $this, 'RenderPromoList')
 		);
+
+		// Sub MENU "PEMESANAN" ****************
+		add_submenu_page(
+			'onex-main-page',
+			'Pemesanan',
+			'Pemesanan',
+			'manage_options',
+			'onex-pemesanan-page',
+			array( $this, 'RenderPemesananList')
+			);
+	}
+
+	function RenderPemesananList(){
+		return $this->getHtmlTemplate(  'pemesanan/templates/', 'pemesanan_main', $attributes);
 	}
 
 	function RenderTarifKirimList(){
 		$this->onex_tarif_kirim_obj->SetATarifKirim();
 		$attributes = $this->onex_tarif_kirim_obj;
 
-		//var_dump(plugin_dir_url(__FILE__).'js/one-express.js');
 		return $this->getHtmlTemplate(  'ongkos-kirim/templates/', 'ongkos_kirim_main', $attributes);
 	}
 
@@ -439,7 +583,6 @@ class Onex_Plugin{
 	}
 
 	function RenderDeliveryHapus(){
-		//var_dump($_GET['id']);
 		$this->onex_jenis_delivery_obj->SetAJenisDelivery( $_GET['id']);
 		$attributes = $this->onex_jenis_delivery_obj;
 
@@ -453,8 +596,6 @@ class Onex_Plugin{
 	}
 
 	function RenderDistributorList(){
-		//$attributes = $this->onex_distributor_obj->DistributorList();
-		//var_dump($attributes);
         $schedule = wp_get_schedule( 'my_hourly_event' );
         var_dump($schedule);
 		return $this->getHtmlTemplate(  'distributor/templates/', 'distributor_main', $attributes);
@@ -485,15 +626,12 @@ class Onex_Plugin{
 			$katdel->SetAJenisDelivery( $katdel_id);
 			$attributes['katdel'][$i] = $katdel;
 			$i+=1;
-		}//var_dump($attributes['katdel'] );
-		//$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor($_GET['id']);
-		//$attributes['katdel'] = $this->onex_jenis_delivery_obj->DeliveryList();
+		}
 
 		return $this->getHtmlTemplate( 'distributor/templates/', 'distributor_update', $attributes);
 	}
 
 	function RenderKategoriMenuList(){
-		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
 		return $this->getHtmlTemplate(  'kategori-menu/templates/', 'kategori_menu_main', $attributes);
 	}
@@ -539,7 +677,6 @@ class Onex_Plugin{
 	}
 
 	function RenderMenuDistributorHapus(){
-		//var_dump($_GET['id']);
 		$get_menudel_id = sanitize_text_field( $_GET['menu']);
 		$this->onex_menu_distributor_obj->SetAMenuDistributor( $get_menudel_id );
 		$attributes = $this->onex_menu_distributor_obj;
@@ -557,25 +694,39 @@ class Onex_Plugin{
 	}
 
 	function RenderLokasiList(){
-		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
 		return $this->getHtmlTemplate(  'lokasi/templates/', 'lokasi_main', $attributes);
 	}
 
 	function RenderBankList(){
-		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
 		return $this->getHtmlTemplate(  'bank/templates/', 'bank_main', $attributes);
 	}
 
 	function RenderBankTambah(){
-		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
 		return $this->getHtmlTemplate(  'bank/templates/', 'bank_tambah', $attributes);
 	}
 
+	function RenderBankHapus(){
+		$get_bank_id = sanitize_text_field( $_GET['id']);
+		$bank = new Onex_Bank();
+		$bank->SetABank_Id( $get_bank_id);
+		$attributes = $bank;
+
+		return $this->getHtmlTemplate( 'bank/templates/', 'bank_hapus', $attributes);
+	}
+
+	function RenderBankUpdate(){
+		$get_bank_id = sanitize_text_field( $_GET['id']);
+		$bank = new Onex_Bank();
+		$bank->SetABank_Id( $get_bank_id);
+		$attributes = $bank;
+
+		return $this->getHtmlTemplate(  'bank/templates/', 'bank_update', $attributes);
+	}
+
 	function RenderPromoList(){
-		//$attributes = $this->onex_kategori_menu_obj->GetKategoriMenuList();
 
 		return $this->getHtmlTemplate(  'promo/templates/', 'promo_main', $attributes);
 	}
@@ -592,7 +743,6 @@ class Onex_Plugin{
 }
 
 $onex_plugin_obj = new Onex_Plugin();
-
 
 register_activation_hook( __FILE__, array('Onex_Plugin', 'plugin_activated'));
 
