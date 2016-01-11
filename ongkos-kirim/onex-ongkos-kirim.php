@@ -57,6 +57,30 @@ class Onex_Ongkos_Kirim{
 		}
 	}
 
+	public function CreateNewTarifKirim(){
+		global $wpdb;
+
+		$result = array('status'=>false, 'message' =>'');
+
+		if( $wpdb->insert(
+				$this->table_name,
+				array(
+					'jarak_min_kirim' => $this->jarak_minimal,
+					'tarif_min_kirim' => $this->tarif_minimal,
+					'tarif_normal_kirim' => $this->tarif_normal
+				),
+				array('%d','%d','%d')
+			)
+		){
+			$this->id = $wpdb->insert_id;
+			$result['status'] = true;
+			$result['message'] = "Berhasil menambah tarif.";
+		}else{
+			$result['message'] = "Terjadi kesalahan.";
+		}
+		return $result;
+	}
+
 	public function SetATarifKirim_Id( $tarif_id){
 		global $wpdb;
 

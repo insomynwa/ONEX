@@ -1,5 +1,5 @@
 <?php 
-$nmr = 1;//var_dump($attributes['invoice']);
+$nmr = $attributes['nomor'];//var_dump($attributes['invoice']);
 if( sizeof($attributes['invoice']) > 0 ): ?>
 <table class="table table-hover table-responsive">
 	<tr><th>No</th>
@@ -7,6 +7,7 @@ if( sizeof($attributes['invoice']) > 0 ): ?>
 		<th>Total</th>
 		<th>Pembayaran</th>
 		<th>Jam Pengiriman</th>
+		<th>Status</th>
 		<th></th>
 		<th>Manage</th>
 	</tr>
@@ -26,10 +27,10 @@ if( sizeof($attributes['invoice']) > 0 ): ?>
 		<?php endif; ?>
 		</td>
 		<td><?php if($invoice->GetJamKirim()==$invoice->GetTanggalUserConfirm() ) echo "Sekarang"; else echo date( "j M Y, H:i", strtotime( $invoice->GetJamKirim())); ?></td>
-		<td><a class="detail-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href="#modal-invoice" href="#" >Detail</a></td>
+		<td><?php echo $attributes['status'][$i]->GetStatus(); ?></td>
+		<td><a class="detail-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href="#modal-invoice" >Detail</a></td>
 		<td>
-			<a href='<?php //echo admin_url('admin.php?page=onex-distributor-hapus&id='. $distributor->id_dist); ?>'>Cancel</a> | 
-			<a href='<?php //echo admin_url('admin.php?page=onex-distributor-update&id='. $distributor->id_dist); ?>'>ACCEPT</a>
+			<a class="konfirmasi-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href='#modal-invoice'>KONFIRMASI</a>
 		</td>
 	</tr>
 	<?php $nmr += 1; ?>
@@ -43,7 +44,7 @@ if( sizeof($attributes['invoice']) > 0 ): ?>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Pesanan Baru - Detail</h4>
+                <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body" id="modal-invoice-body">
 
@@ -75,7 +76,21 @@ jQuery(document).ready( function($) {
 
         $.get( ajax_one_express.ajaxurl, data, function ( response) {
             $("div#modal-invoice-body").html(response);
+            $("h4.modal-title").html("Pemesanan Baru - Detail");
         });
     });
+    $("a.konfirmasi-link").click( function() {
+    	var inv = (this.id).split('_').pop();
+        var data = {
+            'action' : 'AjaxRetrieveStatusPemesanan',
+            'invoice': inv
+        };
+
+        $.get( ajax_one_express.ajaxurl, data, function (response) {
+        	$("div#modal-invoice-body").html(response);
+            $("h4.modal-title").html("Pemesanan Baru - Status");
+        });
+    });
+
 });
 </script>

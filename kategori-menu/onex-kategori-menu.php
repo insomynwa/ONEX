@@ -99,6 +99,19 @@ class Onex_Kategori_Menu{
 		return $attributes;
 	}
 
+	public function GetAllKategori(){
+		global $wpdb;
+		
+		$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_katmenu FROM $this->table_name"
+						 ,null
+					)
+				);
+
+		return $result;
+	}
+
 	public function DeleteKategoriMenu(){
 		global $wpdb;
 

@@ -18,7 +18,9 @@ subtotal + tax DONE
 -"pesan sekarang" disable DONE
 bank DONE
 pagination menu list DONE
+tbl invoice add bank, mode kirim, tgl usr confirm, tgl admin confirm, status kirim DONE
+add htaccess wp-content DONE
+mod root htaccess DONE
 
-tbl invoice add bank, mode kirim, tgl usr confirm, tgl admin confirm, status kirim
-add htaccess wp-content
-mod root htaccess
+add table status pemesanan
+delete invoice status kirim, add status_pemesanan

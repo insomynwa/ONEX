@@ -11,7 +11,7 @@
 <script type="text/javascript">
 	jQuery(document).ready( function($){
 
-		window.doLoadPagination("unconfirmed", "div#new-invoice-pagination-area");
-
+		//window.doLoadPagination("unconfirmed", "div#new-invoice-pagination-area");
+		window.doCreatePagination("pemesanan-waiting", "div#new-invoice-pagination-area");
 	});
 </script>

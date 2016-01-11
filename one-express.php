@@ -14,6 +14,7 @@ include_once('invoice/onex-invoice.php');
 include_once('pemesanan-menu/onex-pemesanan-menu.php');
 include_once('data-pembeli/onex-data-pembeli.php');
 include_once('ongkos-kirim/onex-ongkos-kirim.php');
+include_once('status-pemesanan/onex-status-pemesanan.php');
 class Onex_Plugin{
 
 	private $onex_jenis_delivery_obj;
@@ -52,6 +53,10 @@ class Onex_Plugin{
 		add_action('wp_ajax_AjaxRetrievePemesananList', array( $this, 'AjaxRetrieve_Pemesanan_List') );
 		add_action('wp_ajax_AjaxRetrieveInvoiceDetail', array( $this, 'AjaxRetrieve_Invoice_Detail') );
 		add_action('wp_ajax_AjaxRetrievePagination', array( $this, 'AjaxRetrieve_Pagination') );
+		add_action('wp_ajax_AjaxCreatePagination', array( $this, 'AjaxCreate_Pagination') );
+		add_action('wp_ajax_AjaxRetrieveList', array( $this, 'AjaxRetrieveListFor') );
+		add_action('wp_ajax_AjaxRetrieveKategoriOnDistributor', array( $this, 'AjaxRetrieve_Kategori_OnDistributor') );
+		add_action('wp_ajax_AjaxRetrieveStatusPemesanan', array( $this, 'AjaxRetrieve_StatusPemesanan_List') );
 
 		//add_action('wp_enqueue_scripts', array( $this, 'load_plugin_styles'));
 	}
@@ -232,7 +237,7 @@ class Onex_Plugin{
 		wp_die();
 	}
 
-	function AjaxRetrieve_Pemesanan_List(){
+	/*function AjaxRetrieve_Pemesanan_List(){
 		if( isset( $_GET['page']) && $_GET['page']!="" && isset( $_GET['status']) && $_GET['status']!="" ){
 			$get_page = sanitize_text_field( $_GET['page']);
 			$get_status = sanitize_text_field( $_GET['status']);
@@ -262,15 +267,16 @@ class Onex_Plugin{
 				$attributes['bank'][$nmr] = $bank;
 				$nmr += 1;
 			}
+			$attributes['nomor'] = $offset + 1;
 			
 			echo $this->getHtmlTemplate(  'pemesanan/templates/', 'pemesanan_list', $attributes);
 		}
 
 		
 		wp_die();
-	}
+	}*/
 
-	function AjaxRetrieve_Pagination(){
+	/*function AjaxRetrieve_Pagination(){
 		if( isset($_GET['status']) && $_GET['status'] != "" ){
 			$get_status = sanitize_text_field( $_GET['status']);
 
@@ -285,6 +291,123 @@ class Onex_Plugin{
 				$data['status'] = $get_status;
 			}
 			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_list_pagination', $data );
+		}
+		wp_die();
+	}*/
+
+	function AjaxCreate_Pagination(){
+		if( isset( $_GET['forlist']) && $_GET['forlist']!="") {
+			$get_forlist = sanitize_text_field( $_GET['forlist']);
+			if( $get_forlist=="menudel-all") {
+				$jumlah_data = $this->onex_menu_distributor_obj->CountAllMenu();
+				$limit = 3;
+				$jumlah_page = intval($jumlah_data / $limit);
+				if( $jumlah_data % $limit > 0)
+					$jumlah_page += 1;
+				//var_dump($jumlah_data, $jumlah_page);
+				$data['jumlah_page'] = $jumlah_page;
+			}else if( $get_forlist=="pemesanan-waiting"){
+				$status = 1;
+				$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+				$limit = 3;
+				$jumlah_page = intval($jumlah_data / $limit);
+				if( $jumlah_data % $limit > 0)
+					$jumlah_page += 1;
+				//var_dump($jumlah_data, $jumlah_page);
+				$data['jumlah_page'] = $jumlah_page;
+			}
+			$data['forlist'] = $get_forlist;
+			echo $this->getHtmlTemplate( 'templates/', 'onex_pagination', $data );
+		}
+		wp_die();
+	}
+
+	function AjaxRetrieveListFor(){
+		if( isset( $_GET['page']) && $_GET['page']!="" && isset( $_GET['forlist']) && $_GET['forlist']!="" ){
+			$get_page = sanitize_text_field( $_GET['page']);
+			$get_forlist = sanitize_text_field( $_GET['forlist']);
+
+			if( $get_forlist == "menudel-all" ){
+
+				$limit = 3;
+				$offset = ( $get_page - 1) * $limit;
+				$dir = "";
+				$filename = "";
+
+				$all_menu = $this->onex_menu_distributor_obj->GetAllMenu($limit, $offset);
+				$attributes = array();
+				$nmr=0;
+				foreach( $all_menu as $m){
+					$menudel_id = $m->id_menudel;
+					$menu = new Onex_Menu_Distributor();
+					$menu->SetAMenuDistributor( $menudel_id );
+					$attributes['menu'][$nmr] = $menu;
+					$katmenu = new Onex_Kategori_Menu();
+					$katmenu->SetAKategoriMenu( $menu->GetKatmenu());
+					$attributes['katmenu'][$nmr] = $katmenu;
+					$distributor = new Onex_Distributor();
+					$distributor->SetADistributor( $menu->GetDistributor());
+					$attributes['distributor'][$nmr] = $distributor;
+					$nmr += 1;
+				}
+				$attributes['nomor'] = $offset + 1;
+				$dir = "menu-distributor/templates/";
+				$filename = "menu_distributor_list";
+			}else if( $get_forlist == "pemesanan-waiting") {
+				$status = 1;
+				$limit = 3;
+				$offset = ( $get_page - 1) * $limit;
+
+				$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+
+				$data= array();
+
+				$nmr = 0;
+				foreach( $invoices as $i){
+					$invoice_id = $i->id_invoice;
+
+					$invoice = new Onex_Invoice();
+					$pemesanan = new Onex_Pemesanan_Menu();
+					$distributor = new Onex_Distributor();
+					$bank = new Onex_Bank();
+					$status_pemesanan = new Onex_Status_Pemesanan();
+
+					$invoice->SetAnInvoice_Id( $invoice_id);
+					$attributes['invoice'][$nmr] = $invoice;
+					$distributor->SetADistributor( $invoice->GetDistributor());
+					$attributes['distributor'][$nmr] = $distributor;
+					$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+					$bank->SetABank_Id( $invoice->GetBank());
+					$attributes['bank'][$nmr] = $bank;
+					$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+					$attributes['status'][$nmr] = $status_pemesanan;
+					$nmr += 1;
+				}
+				$attributes['nomor'] = $offset + 1;
+				$dir = "pemesanan/templates/";
+				$filename = "pemesanan_list";
+			}
+
+			echo $this->getHtmlTemplate(  $dir, $filename, $attributes);
+		}
+		wp_die();
+	}
+
+	function AjaxRetrieve_Kategori_OnDistributor(){
+		if( isset($_GET['distributor'] ) && $_GET['distributor'] != "" ) {
+			$get_distributor = sanitize_text_field( $_GET['distributor']);
+
+			$all_katmenu = $this->onex_kategori_menu_obj->GetAllKategoriMenu_Distributor( $get_distributor);
+			$nmr = 0;
+			foreach( $all_katmenu as $km){
+				$katmenu_id = $km->id_katmenu;
+				$katmenu = new Onex_Kategori_Menu();
+				$katmenu->SetAKategoriMenu( $katmenu_id);
+				$attributes['nama'][$nmr] = $katmenu->GetNama();
+				$attributes['id'][$nmr] = $katmenu_id;
+				$nmr += 1;
+			}
+			echo wp_json_encode($attributes);
 		}
 		wp_die();
 	}
@@ -326,6 +449,32 @@ class Onex_Plugin{
 
 			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_detail_invoice', $data );
 		}
+		wp_die();
+	}
+
+	function AjaxRetrieve_StatusPemesanan_List(){
+		if( isset($_GET['invoice']) && $_GET['invoice']!="") {
+			$get_invoice = sanitize_text_field( $_GET['invoice']);
+
+			$invoice = new Onex_Invoice();
+			$invoice->SetAnInvoice_Id( $get_invoice);
+			$data['current_status'] = $invoice->GetStatusPemesanan();
+
+			$statuses = new Onex_Status_Pemesanan();
+			$all_status = $statuses->GetAllStatusPemesananId();
+			$nmr = 0;
+			foreach ($all_status as $s) {
+				# code...
+				$status_id = $s->id_status;
+				$status = new Onex_Status_Pemesanan;
+				$status->SetAStatusPemesanan_Id($status_id);
+				$data['status'][$nmr] = $status;
+
+				$nmr+=1;
+			}
+			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_status', $data );
+		}
+
 		wp_die();
 	}
 
@@ -445,14 +594,14 @@ class Onex_Plugin{
 		);
 
 		// Sub MENU "MENU DISTRIBUTOR"
-		/*add_submenu_page(
-			null,
-			'Menu Distributor',
-			'Menu Distributor',
+		add_submenu_page(
+			'onex-main-page',
+			'Menu',
+			'Menu',
 			'manage_options',
 			'onex-menu-distributor-page',
 			array( $this, 'RenderMenuDistributorList')
-		);*/
+		);
 		add_submenu_page(
 			null,
 			'Tambah Menu Distributor',
@@ -567,7 +716,16 @@ class Onex_Plugin{
 
 	function RenderTarifKirimList(){
 		$this->onex_tarif_kirim_obj->SetATarifKirim();
-		$attributes = $this->onex_tarif_kirim_obj;
+		if( $this->onex_tarif_kirim_obj->GetId()==0){
+			$new_tarif = new Onex_Ongkos_Kirim();
+			$new_tarif->SetJarakMinimal(5);
+			$new_tarif->SetTarifMinimal(10000);
+			$new_tarif->SetTarifNormal(3000);
+			$new_tarif->CreateNewTarifKirim();
+			$attributes = $new_tarif;
+		}else{
+			$attributes = $this->onex_tarif_kirim_obj;
+		}
 
 		return $this->getHtmlTemplate(  'ongkos-kirim/templates/', 'ongkos_kirim_main', $attributes);
 	}
@@ -662,15 +820,45 @@ class Onex_Plugin{
 	}
 
 	function RenderMenuDistributorList(){
-		$attributes = $this->onex_menu_distributor_obj->GetMenuDistributorList();
 
-		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_list', $attributes);
+		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_main', $attributes);
 	}
 
 	function RenderMenuDistributorTambah(){
 		if(isset($_GET['distributor']) && isset($_GET['kategori'])){
-			$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $_GET['distributor']);
-			$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $_GET['kategori']);
+			$get_distributor = sanitize_text_field($_GET['distributor']);
+			$get_katmenu = sanitize_text_field( $_GET['kategori']);
+
+			$distributor = new Onex_Distributor();
+			$distributor->SetADistributor($get_distributor);
+			$katmenu = new Onex_Kategori_Menu();
+			$katmenu->SetAKategoriMenu($get_katmenu);
+
+			$attributes['distributor'] = $distributor;
+			$attributes['katmenu'] = $katmenu;
+			/*$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $_GET['distributor']);
+			$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $_GET['kategori']);*/
+			$attributes['single'] = true;
+		}else{
+			$attributes['single'] = false;
+			$all_distributor = $this->onex_distributor_obj->GetAllDistributor();
+			$all_katmenu = $this->onex_kategori_menu_obj->GetAllKategori();
+			$nmr = 0;
+			foreach ($all_distributor as $d) {
+				$distributor_id = $d->id_dist;
+				$distributor = new Onex_Distributor();
+				$distributor->SetADistributor($distributor_id);
+				$attributes['distributor'][$nmr] = $distributor;
+				$nmr += 1;
+			}
+			$nmr = 0;
+			foreach ($all_katmenu as $km) {
+				$katmenu_id = $km->id_katmenu;
+				$katmenu = new Onex_Kategori_Menu();
+				$katmenu->SetAKategoriMenu($katmenu_id);
+				$attributes['katmenu'][$nmr] = $katmenu;
+				$nmr += 1;
+			}
 		}
 
 		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_tambah', $attributes);

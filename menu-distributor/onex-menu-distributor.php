@@ -78,7 +78,22 @@ class Onex_Menu_Distributor{
 		return $result;
 	}
 
-	public function GetMenuDistributorList(){
+	public function GetAllMenu( $limit, $offset){
+		global $wpdb;
+		
+		$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_menudel FROM $this->table_name
+						 ORDER BY nama_menudel ASC
+						 LIMIT %d, %d",
+						 $offset, $limit
+					)
+				);
+
+		return $result;
+	}
+
+	/*public function GetMenuDistributorList(){
 		global $wpdb;
 
 		if($wpdb->get_var("SELECT COUNT(*) FROM $this->table_name") > 0){
@@ -94,7 +109,7 @@ class Onex_Menu_Distributor{
 		}
 
 		return $attributes;
-	}
+	}*/
 
 	/**
 	*
@@ -117,6 +132,21 @@ class Onex_Menu_Distributor{
 				);
 
 		return $attributes;
+	}
+
+	public function CountAllMenu(){
+		global $wpdb;
+
+		$row =
+			$wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(id_menudel) AS jumlah FROM $this->table_name",
+					null
+					),
+					ARRAY_A
+				);
+
+		return $row['jumlah'];
 	}
 
 	public function CountMenu_Kategori( $katmenu_id){

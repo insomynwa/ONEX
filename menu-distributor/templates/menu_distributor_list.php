@@ -1,37 +1,37 @@
-<div class="wrap">
-	<h2>Daftar Kategori Menu</h2>
 	<a href='<?php echo admin_url('admin.php?page=onex-menu-distributor-tambah'); ?>' >Tambah</a>
 
 	<?php 
-	$nmr = 1;
-	if( count($attributes['menudist']) > 0 ): ?>
-	<table>
+	$nmr = $attributes['nomor'];
+	if( sizeof($attributes['menu']) > 0 ): ?>
+	<table class="table table-hover table-responsive">
 		<tr><th>No</th>
 			<th>Nama Menu</th>
 			<th>Harga</th>
-			<th>Keterangan</th>
-			<th>Distributor</th>
 			<th>Kategori</th>
+			<th>Distributor</th>
 			<th></th>
 		</tr>
-				<?php foreach($attributes['menudist'] as $menudist ): ?>
+				<?php for( $i=0; $i< sizeof($attributes['menu']) ; $i++): ?>
+					<?php 
+					$menu = $attributes['menu'][$i];
+					$katmenu = $attributes['katmenu'][$i];
+					$distributor = $attributes['distributor'][$i];
+					?>
 					<tr>
 						<td><?php echo $nmr; ?></td>
-						<td><?php echo $menudist->nama_menudel; ?></td>
-						<td><?php echo $menudist->harga_menudel; ?></td>
-						<td><?php echo $menudist->keterangan_menudel; ?></td>
-						<td><?php echo $menudist->distributor_id; ?></td>
-						<td><?php echo $menudist->katmenu_id; ?></td>
+						<td><?php echo $menu->GetNama(); ?></td>
+						<td><?php echo $menu->GetHarga(); ?></td>
+						<td><?php echo $katmenu->GetNama(); ?></td>
+						<td><?php echo $distributor->GetNama(); ?></td>
 						<td>
-							<a href='<?php echo admin_url('admin.php?page=onex-distributor-hapus&id='. $distributor->id_dist); ?>'>Hapus</a> | 
-							<a href='<?php echo admin_url('admin.php?page=onex-distributor-update&id='. $distributor->id_dist); ?>'>Update</a>
+							<a href="<?php echo admin_url('admin.php?page=onex-menu-distributor-hapus&menu='. $menu->GetId()); ?>">Hapus</a> | 
+							<a href="<?php echo admin_url('admin.php?page=onex-menu-distributor-update&menu='. $menu->GetId()); ?>">Update</a>
 						</td>
 					</tr>
 					<?php $nmr += 1; ?>
-				<?php endforeach; ?>
+				<?php endfor; ?>
 	</table>
 	<?php else: ?>
 	<p>Belum ada data.</p>
 	<?php endif; ?>
 	<a href='<?php echo admin_url('admin.php?page=onex-menu-distributor-tambah'); ?>' >Tambah</a>
-</div>

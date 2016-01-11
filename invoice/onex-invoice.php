@@ -67,9 +67,9 @@ class Onex_Invoice{
 	public function GetTanggalAdminConfirm() { return $this->tgl_admin_confirm; }
 	//public function SetTanggalAdminConfirm($tgl_admin_confirm) { $this->tgl_admin_confirm = $tgl_admin_confirm; }
 
-	private $status_kirim;
-	public function GetStatusKirim() { return $this->status_kirim; }
-	public function SetStatusKirim($status_kirim) { $this->status_kirim = $status_kirim; }
+	private $status_pemesanan;
+	public function GetStatusPemesanan() { return $this->status_pemesanan; }
+	public function SetStatusPemesanan($status_pemesanan) { $this->status_pemesanan = $status_pemesanan; }
 
 
 	public function __construct(){
@@ -213,7 +213,7 @@ class Onex_Invoice{
 			$this->status_admin_confirm = $row['status_admin_confirm'];
 			$this->tgl_user_confirm = $row['tgl_user_confirm'];
 			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
-			$this->status_kirim = $row['status_kirim'];
+			$this->status_pemesanan = $row['status_pemesanan'];
 		}
 	}
 
@@ -249,8 +249,8 @@ class Onex_Invoice{
 		return $result;
 	}
 
-	public function GetLimitInvoice_Status( $status = "unconfirmed", $limit, $offset ){
-		$user_confirm = 0;
+	public function GetLimitInvoice_Status( $status = 1, $limit, $offset ){
+		/*$user_confirm = 0;
 		$admin_confirm = 0;
 		if( $status == "unconfirmed" ){
 			$user_confirm = 1;
@@ -258,17 +258,16 @@ class Onex_Invoice{
 		}else if( $status == "confirmed") {
 			$user_confirm = 1;
 			$admin_confirm = 1;
-		}
+		}*/
 		global $wpdb;
 		$result =
 			$wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT id_invoice FROM $this->table_name
-					WHERE status_user_confirm = %d 
-					AND status_admin_confirm = %d 
+					WHERE status_pemesanan = %d  
 					ORDER BY jam_kirim_invoice ASC
 					LIMIT %d, %d",
-					$user_confirm, $admin_confirm,
+					$status,
 					$offset, $limit
 					)
 				);
@@ -276,8 +275,8 @@ class Onex_Invoice{
 		return $result;
 	}
 
-	public function CountInvoiceStatus($status="unconfirmed") {
-		$user_confirm = 0;
+	public function CountInvoiceStatus($status=1) {
+		/*$user_confirm = 0;
 		$admin_confirm = 0;
 		if( $status == "unconfirmed" ){
 			$user_confirm = 1;
@@ -285,7 +284,7 @@ class Onex_Invoice{
 		}else if( $status == "confirmed") {
 			$user_confirm = 1;
 			$admin_confirm = 1;
-		}
+		}*/
 
 		global $wpdb;
 
@@ -293,9 +292,8 @@ class Onex_Invoice{
 			$wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
-					WHERE status_user_confirm = %d 
-					AND status_admin_confirm = %d",
-					$user_confirm, $admin_confirm
+					WHERE status_pemesanan = %d",
+					$status
 					),
 					ARRAY_A
 				);
@@ -377,7 +375,7 @@ class Onex_Invoice{
 			$this->tipe_bayar = $row['tipe_bayar'];
 			$this->tgl_user_confirm = $row['tgl_user_confirm'];
 			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
-			$this->status_kirim = $row['status_kirim'];
+			$this->status_pemesanan = $row['status_pemesanan'];
 		}
 	}
 
