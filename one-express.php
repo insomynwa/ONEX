@@ -57,6 +57,7 @@ class Onex_Plugin{
 		add_action('wp_ajax_AjaxRetrieveList', array( $this, 'AjaxRetrieveListFor') );
 		add_action('wp_ajax_AjaxRetrieveKategoriOnDistributor', array( $this, 'AjaxRetrieve_Kategori_OnDistributor') );
 		add_action('wp_ajax_AjaxRetrieveStatusPemesanan', array( $this, 'AjaxRetrieve_StatusPemesanan_List') );
+		add_action('wp_ajax_AjaxUpdateStatusPemesanan', array( $this, 'AjaxUpdate_StatusPemesanan') );
 
 		//add_action('wp_enqueue_scripts', array( $this, 'load_plugin_styles'));
 	}
@@ -83,10 +84,12 @@ class Onex_Plugin{
 		wp_register_script("otw-scripts", plugin_dir_url(__FILE__).'js/one-express.js');
 		wp_register_script("bootstrapminjs", get_template_directory_uri().'/css/bootstrap/js/bootstrap.min.js');
 		wp_register_style("bootstrapmincss", get_template_directory_uri().'/css/bootstrap/css/bootstrap.min.css');
+		wp_register_style("plugincss", plugin_dir_url(__FILE__).'css/styles.css');
 
 		wp_enqueue_script("otw-scripts");
 		wp_enqueue_script("bootstrapminjs");
 		wp_enqueue_style("bootstrapmincss");
+		wp_enqueue_style("plugincss");
 
 		wp_localize_script( "otw-scripts", "ajax_one_express", array('ajaxurl'=>admin_url('admin-ajax.php')) );
 	}
@@ -459,12 +462,12 @@ class Onex_Plugin{
 			$invoice = new Onex_Invoice();
 			$invoice->SetAnInvoice_Id( $get_invoice);
 			$data['current_status'] = $invoice->GetStatusPemesanan();
+			$data['invoice'] = $get_invoice;
 
 			$statuses = new Onex_Status_Pemesanan();
 			$all_status = $statuses->GetAllStatusPemesananId();
 			$nmr = 0;
 			foreach ($all_status as $s) {
-				# code...
 				$status_id = $s->id_status;
 				$status = new Onex_Status_Pemesanan;
 				$status->SetAStatusPemesanan_Id($status_id);
@@ -475,6 +478,20 @@ class Onex_Plugin{
 			echo $this->getHtmlTemplate( 'pemesanan/templates/', 'pemesanan_status', $data );
 		}
 
+		wp_die();
+	}
+
+	public function AjaxUpdate_StatusPemesanan(){
+		if( isset( $_POST['invoice']) && isset($_POST['status']) && $_POST['invoice']!="" && $_POST['status']!="" ){
+			$post_invoice = sanitize_text_field( $_POST['invoice']);
+			$post_status = sanitize_text_field( $_POST['status']);
+
+			$invoice = new Onex_Invoice();
+			$invoice->SetAnInvoice_Id( $post_invoice);
+			$invoice->SetStatusPemesanan( $post_status);
+			$result = $invoice->UpdateStatusPemesanan();
+			echo wp_json_encode($result);
+		}
 		wp_die();
 	}
 
@@ -874,9 +891,32 @@ class Onex_Plugin{
 
 	function RenderMenuDistributorUpdate(){
 
-		$attributes['menudel'] = $this->onex_menu_distributor_obj->GetMenuDistributorById( $_GET['menu']);
-		$attributes['distributor'] = $this->onex_distributor_obj->GetDistributor( $attributes['menudel']['distributor_id']);
-		$attributes['katmenu'] = $this->onex_kategori_menu_obj->GetKategoriMenuById( $attributes['menudel']['katmenu_id']);
+		if( isset($_GET['menu'])) {
+			$get_menu_id = sanitize_text_field( $_GET['menu']);
+			$get_distributor_id = "";
+			$get_katmenu_id = "";
+			$attributes = array();
+
+			$all_distributor = $this->onex_distributor_obj->GetAllDistributor();
+			$nmr = 0;
+			foreach( $all_distributor as $d){
+				$distributor_id = $d->id_dist;
+				$dist = new Onex_Distributor();
+				$dist->SetADistributor( $distributor_id);
+				$attributes['all-distributor'][$nmr] = $dist;
+				$nmr += 1;
+			}
+
+			$menudist = new Onex_Menu_Distributor();
+			$menudist->SetAMenuDistributor( $get_menu_id );
+			$attributes['menudel'] = $menudist;
+			$distributor = new Onex_Distributor();
+			$distributor->SetADistributor( $menudist->GetDistributor(0));
+			$attributes['menu-distributor'] = $distributor;
+			$katmenu = new Onex_Kategori_Menu();
+			$katmenu->SetAKategoriMenu( $menudist->GetKatmenu());
+			$attributes['menu-katmenu'] = $katmenu;
+		}
 
 		return $this->getHtmlTemplate(  'menu-distributor/templates/', 'menu_distributor_update', $attributes);
 	}

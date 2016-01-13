@@ -74,16 +74,16 @@
 			<?php endif; ?>
 		</p>
 		<p>Nama Menu <strong>*</strong><br />
-			<input type="text" name="menudist-nama" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_nama; ?>" />
+			<input required type="text" name="menudist-nama" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_nama; ?>" />
 		</p>
 		<p>Keterangan<br />
 			<textarea name="menudist-keterangan"></textarea>
 		</p>
 		<p>Harga <strong>*</strong><br />
-			<input type="text" name="menudist-harga" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_harga; ?>" />
+			<input required type="text" name="menudist-harga" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_harga; ?>" />
 		</p>
 		<p>Gambar <strong>*</strong><br />
-			<input type="text" name="menudist-gambar-url" id="image_url" class="regular-text" value="<?php if($isPosted && !$result['status']) echo $menudist_gambar; ?>">
+			<input required type="text" name="menudist-gambar-url" id="image_url" class="regular-text" value="<?php if($isPosted && !$result['status']) echo $menudist_gambar; ?>">
     		<input type="button" name="menudist-gambar-button" id="upload-btn" class="button-secondary" value="Upload Image">
 		</p>
 		<p>

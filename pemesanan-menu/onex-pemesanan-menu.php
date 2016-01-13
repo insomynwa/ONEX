@@ -61,6 +61,23 @@ class Onex_Pemesanan_Menu{
 		return false;
 	}
 
+	public function UpdateHargaAndNilai(){
+		global $wpdb;
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $this->table_name
+				SET harga_satuan = %d, nilai_pesanan = %d
+				WHERE id_pesanan = %d",
+				$this->harga_satuan, $this->nilai_pesanan,
+				$this->id
+				)
+			)){
+			return true;
+		}
+		return false;
+	}
+
 	public function UpdateJumlahPemesanan(){
 		global $wpdb;
 
@@ -110,6 +127,21 @@ class Onex_Pemesanan_Menu{
 		);
 	}
 
+	/*public function GetAllIdPemesananMenu_HasMenu( $menudel_id){
+		global $wpdb;
+
+		$result = 
+		$wpdb->query(
+			$wpdb->prepare(
+				"SELECT id_pesanan FROM $this->table_name
+				WHERE menudel_id = %d",
+				$menudel_id
+				)
+			);
+
+		return $result;
+	}
+*/
 	public function DeletePesananMenu_MenuDelivery( $menudel_id){
 		global $wpdb;
 

@@ -21,6 +21,10 @@ pagination menu list DONE
 tbl invoice add bank, mode kirim, tgl usr confirm, tgl admin confirm, status kirim DONE
 add htaccess wp-content DONE
 mod root htaccess DONE
+add table status pemesanan DONE
+delete invoice status kirim, add status_pemesanan DONE
 
-add table status pemesanan
-delete invoice status kirim, add status_pemesanan
+delete tgl_konfirmasi admin
+menu_distributor_update.php 
+	create invoice if change distributor  ?????
+	harga only number DONE

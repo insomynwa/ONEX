@@ -63,8 +63,8 @@ class Onex_Invoice{
 		$this->tgl_user_confirm = $dtime; 
 	}
 
-	private $tgl_admin_confirm;
-	public function GetTanggalAdminConfirm() { return $this->tgl_admin_confirm; }
+	//private $tgl_admin_confirm;
+	//public function GetTanggalAdminConfirm() { return $this->tgl_admin_confirm; }
 	//public function SetTanggalAdminConfirm($tgl_admin_confirm) { $this->tgl_admin_confirm = $tgl_admin_confirm; }
 
 	private $status_pemesanan;
@@ -212,7 +212,7 @@ class Onex_Invoice{
 			$this->bank = $row['bank_id'];
 			$this->status_admin_confirm = $row['status_admin_confirm'];
 			$this->tgl_user_confirm = $row['tgl_user_confirm'];
-			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
+			//$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
 			$this->status_pemesanan = $row['status_pemesanan'];
 		}
 	}
@@ -301,6 +301,24 @@ class Onex_Invoice{
 		return $row['jumlah'];
 	}
 
+	public function UpdateStatusPemesanan(){
+		global $wpdb;
+
+		if($wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $this->table_name 
+				SET status_pemesanan = %d
+				WHERE id_invoice = %d",
+				$this->status_pemesanan,
+				$this->id
+				)
+			)
+		) {
+			return true;
+		}
+		return false;
+	}
+
 	public function GetListOfActiveInvoices_User( $user_id){
 		global $wpdb;
 		$result =
@@ -374,7 +392,7 @@ class Onex_Invoice{
 			$this->bank = $row['bank_id'];
 			$this->tipe_bayar = $row['tipe_bayar'];
 			$this->tgl_user_confirm = $row['tgl_user_confirm'];
-			$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
+			//$this->tgl_admin_confirm = $row['tgl_admin_confirm'];
 			$this->status_pemesanan = $row['status_pemesanan'];
 		}
 	}

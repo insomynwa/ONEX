@@ -238,7 +238,7 @@ class Onex_Menu_Distributor{
 		return $result;
 	}
 
-	public function UpdateMenuDistributor($id, $data){
+	public function UpdateMenuDistributor(){
 		global $wpdb;
 
 		$result = array(
@@ -250,15 +250,15 @@ class Onex_Menu_Distributor{
 		if($wpdb->update(
 			$this->table_name,
 			array(
-				'nama_menudel' => $data['menudist_nama'],
-				'harga_menudel' => $data['menudist_harga'],
-				'gambar_menudel' => $data['menudist_gambar'],
-				'keterangan_menudel' => $data['menudist_keterangan'],
-				'distributor_id' => $data['menudist_distributor'],
-				'katmenu_id' => $data['menudist_kategori']
+				'nama_menudel' => $this->nama,
+				'harga_menudel' => $this->harga,
+				'gambar_menudel' => $this->gambar,
+				'keterangan_menudel' => $this->keterangan,
+				'distributor_id' => $this->distributor,
+				'katmenu_id' => $this->katmenu
 			),
-			array('id_menudel' => $id),
-			array('%s','%s', '%s', '%s', '%d', '%d'),
+			array('id_menudel' => $this->id),
+			array('%s','%d', '%s', '%s', '%d', '%d'),
 			array('%d')
 		)){
 			$result['status'] = true;
@@ -270,6 +270,39 @@ class Onex_Menu_Distributor{
 
 		return $result;
 	}
+
+	// public function UpdateMenuDistributor($id, $data){
+	// 	global $wpdb;
+
+	// 	$result = array(
+	// 				'status' => false,
+	// 				'message' => ''
+	// 			);
+	// 	if ($data['dist_gambar'] == '' ) $data['dist_gambar'] = 'NOIMAGE';
+
+	// 	if($wpdb->update(
+	// 		$this->table_name,
+	// 		array(
+	// 			'nama_menudel' => $data['menudist_nama'],
+	// 			'harga_menudel' => $data['menudist_harga'],
+	// 			'gambar_menudel' => $data['menudist_gambar'],
+	// 			'keterangan_menudel' => $data['menudist_keterangan'],
+	// 			'distributor_id' => $data['menudist_distributor'],
+	// 			'katmenu_id' => $data['menudist_kategori']
+	// 		),
+	// 		array('id_menudel' => $id),
+	// 		array('%s','%s', '%s', '%s', '%d', '%d'),
+	// 		array('%d')
+	// 	)){
+	// 		$result['status'] = true;
+	// 		$result['message'] = 'berhasil diperbaharui.';
+	// 	}else{
+	// 		$result['status'] = true;
+	// 		$result['message'] = 'Tidak ada pembaharuan.';
+	// 	}
+
+	// 	return $result;
+	// }
 
 	public function DeleteMenuDistributor( $menudel_id){
 		global $wpdb;
