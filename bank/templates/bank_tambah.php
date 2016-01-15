@@ -34,7 +34,7 @@
 			<input type="text" name="bank-pemilik-rekening" value="<?php if($isPosted && !$result['status']) echo $bank_pemilik_rekening; ?>" />
 		</p>
 		<p>No. Rekening<strong>*</strong><br />
-			<input type="text" name="bank-no-rekening" value="<?php if($isPosted && !$result['status']) echo $bank_no_rekening; ?>" />
+			<input type="number" name="bank-no-rekening" value="<?php if($isPosted && !$result['status']) echo $bank_no_rekening; ?>" />
 		</p>
 		<p>
 			<!-- <input type="submit" name="distributor-tambah-cancel" value="Batal" /> -->

@@ -16,15 +16,14 @@ jQuery(document).ready( function($) {
     
     var currentPage = 1;
 
-    window.doLoadList(first_selected_page, '<?php echo $attributes["forlist"]; ?>', "div#list-area");
-    //window.doLoadListInvoice(first_selected_page, '<?php echo $attributes["status"]; ?>', "div#list-area");
+    window.doLoadList(first_selected_page, '<?php echo $attributes["forlist"]; ?>', '<?php echo $attributes["limit"]; ?>', '<?php echo $attributes["filter"]; ?>', "div#list-area");
 
     $("a.page-link").click( function() {
 
         var page = (this.id).split('_').pop();
         if(currentPage != page){
             
-            window.doLoadList(page, '<?php echo $attributes["forlist"]; ?>', "div#list-area");
+            window.doLoadList(page, '<?php echo $attributes["forlist"]; ?>', '<?php echo $attributes["limit"]; ?>', '<?php echo $attributes["filter"]; ?>', "div#list-area");
 
             $("a#page_"+currentPage).parent().removeClass('active');
             $("a#page_"+page).parent().addClass('active');

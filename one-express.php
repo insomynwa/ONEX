@@ -299,96 +299,274 @@ class Onex_Plugin{
 	}*/
 
 	function AjaxCreate_Pagination(){
-		if( isset( $_GET['forlist']) && $_GET['forlist']!="") {
+		if( isset( $_GET['forlist']) && $_GET['forlist']!="" && isset( $_GET['status']) && $_GET['status']!="" && isset( $_GET['limit']) && $_GET['limit']!="") {
 			$get_forlist = sanitize_text_field( $_GET['forlist']);
-			if( $get_forlist=="menudel-all") {
-				$jumlah_data = $this->onex_menu_distributor_obj->CountAllMenu();
-				$limit = 3;
-				$jumlah_page = intval($jumlah_data / $limit);
-				if( $jumlah_data % $limit > 0)
-					$jumlah_page += 1;
-				//var_dump($jumlah_data, $jumlah_page);
-				$data['jumlah_page'] = $jumlah_page;
-			}else if( $get_forlist=="pemesanan-waiting"){
-				$status = 1;
-				$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
-				$limit = 3;
-				$jumlah_page = intval($jumlah_data / $limit);
-				if( $jumlah_data % $limit > 0)
-					$jumlah_page += 1;
-				//var_dump($jumlah_data, $jumlah_page);
-				$data['jumlah_page'] = $jumlah_page;
+			$get_filter = sanitize_text_field( $_GET['status']);
+			$get_limit = sanitize_text_field( $_GET['limit']);
+			if( $get_forlist=="menudel") {
+				if( $get_filter == "all") {
+					$jumlah_data = $this->onex_menu_distributor_obj->CountAllMenu();
+					$limit = $get_limit;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				}
+			}else if( $get_forlist=="pemesanan"){
+				/*if( $get_filter=="waiting" ){*/
+					$status = $get_filter;
+					$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+					$limit = $get_limit;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				/*}else if( $get_filter=="all"){
+					$status = 0;
+					$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+					$limit = 3;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				}else if( $get_filter=="pengiriman"){
+					$status = 2;
+					$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+					$limit = 3;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				}else if( $get_filter=="terkirim"){
+					$status = 3;
+					$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+					$limit = 3;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				}else if( $get_filter=="batal"){
+					$status = 4;
+					$jumlah_data = $this->onex_invoice_obj->CountInvoiceStatus( $status);
+					$limit = 3;
+					$jumlah_page = intval($jumlah_data / $limit);
+					if( $jumlah_data % $limit > 0)
+						$jumlah_page += 1;
+					$data['jumlah_page'] = $jumlah_page;
+				}*/
 			}
 			$data['forlist'] = $get_forlist;
+			$data['filter'] = $get_filter;
+			$data['limit'] = $get_limit;
 			echo $this->getHtmlTemplate( 'templates/', 'onex_pagination', $data );
 		}
 		wp_die();
 	}
 
 	function AjaxRetrieveListFor(){
-		if( isset( $_GET['page']) && $_GET['page']!="" && isset( $_GET['forlist']) && $_GET['forlist']!="" ){
+		if( isset( $_GET['page']) && $_GET['page']!="" && isset( $_GET['forlist']) && $_GET['forlist']!="" && isset( $_GET['status']) && $_GET['status']!="" && isset( $_GET['limit']) && $_GET['limit']!=""){
 			$get_page = sanitize_text_field( $_GET['page']);
 			$get_forlist = sanitize_text_field( $_GET['forlist']);
+			$get_filter = sanitize_text_field( $_GET['status']);
+			$get_limit = sanitize_text_field( $_GET['limit']);
 
-			if( $get_forlist == "menudel-all" ){
+			if( $get_forlist == "menudel" ){
 
-				$limit = 3;
-				$offset = ( $get_page - 1) * $limit;
-				$dir = "";
-				$filename = "";
+				if( $get_filter == "all") {
+					$limit = $get_limit;
+					$offset = ( $get_page - 1) * $limit;
+					$dir = "";
+					$filename = "";
 
-				$all_menu = $this->onex_menu_distributor_obj->GetAllMenu($limit, $offset);
-				$attributes = array();
-				$nmr=0;
-				foreach( $all_menu as $m){
-					$menudel_id = $m->id_menudel;
-					$menu = new Onex_Menu_Distributor();
-					$menu->SetAMenuDistributor( $menudel_id );
-					$attributes['menu'][$nmr] = $menu;
-					$katmenu = new Onex_Kategori_Menu();
-					$katmenu->SetAKategoriMenu( $menu->GetKatmenu());
-					$attributes['katmenu'][$nmr] = $katmenu;
-					$distributor = new Onex_Distributor();
-					$distributor->SetADistributor( $menu->GetDistributor());
-					$attributes['distributor'][$nmr] = $distributor;
-					$nmr += 1;
+					$all_menu = $this->onex_menu_distributor_obj->GetAllMenu($limit, $offset);
+					$attributes = array();
+					$nmr=0;
+					foreach( $all_menu as $m){
+						$menudel_id = $m->id_menudel;
+						$menu = new Onex_Menu_Distributor();
+						$menu->SetAMenuDistributor( $menudel_id );
+						$attributes['menu'][$nmr] = $menu;
+						$katmenu = new Onex_Kategori_Menu();
+						$katmenu->SetAKategoriMenu( $menu->GetKatmenu());
+						$attributes['katmenu'][$nmr] = $katmenu;
+						$distributor = new Onex_Distributor();
+						$distributor->SetADistributor( $menu->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "menu-distributor/templates/";
+					$filename = "menu_distributor_list";
 				}
-				$attributes['nomor'] = $offset + 1;
-				$dir = "menu-distributor/templates/";
-				$filename = "menu_distributor_list";
-			}else if( $get_forlist == "pemesanan-waiting") {
-				$status = 1;
-				$limit = 3;
-				$offset = ( $get_page - 1) * $limit;
+			}else if( $get_forlist == "pemesanan") {
 
-				$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+				/*if( $get_filter == "waiting") {*/
+					$status = $get_filter;
+					$limit = $get_limit;
+					$offset = ( $get_page - 1) * $limit;
 
-				$data= array();
+					$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
 
-				$nmr = 0;
-				foreach( $invoices as $i){
-					$invoice_id = $i->id_invoice;
+					$data= array();
 
-					$invoice = new Onex_Invoice();
-					$pemesanan = new Onex_Pemesanan_Menu();
-					$distributor = new Onex_Distributor();
-					$bank = new Onex_Bank();
-					$status_pemesanan = new Onex_Status_Pemesanan();
+					$nmr = 0;
+					foreach( $invoices as $i){
+						$invoice_id = $i->id_invoice;
 
-					$invoice->SetAnInvoice_Id( $invoice_id);
-					$attributes['invoice'][$nmr] = $invoice;
-					$distributor->SetADistributor( $invoice->GetDistributor());
-					$attributes['distributor'][$nmr] = $distributor;
-					$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
-					$bank->SetABank_Id( $invoice->GetBank());
-					$attributes['bank'][$nmr] = $bank;
-					$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
-					$attributes['status'][$nmr] = $status_pemesanan;
-					$nmr += 1;
-				}
-				$attributes['nomor'] = $offset + 1;
-				$dir = "pemesanan/templates/";
-				$filename = "pemesanan_list";
+						$invoice = new Onex_Invoice();
+						$pemesanan = new Onex_Pemesanan_Menu();
+						$distributor = new Onex_Distributor();
+						$bank = new Onex_Bank();
+						$status_pemesanan = new Onex_Status_Pemesanan();
+
+						$invoice->SetAnInvoice_Id( $invoice_id);
+						$attributes['invoice'][$nmr] = $invoice;
+						$distributor->SetADistributor( $invoice->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+						$bank->SetABank_Id( $invoice->GetBank());
+						$attributes['bank'][$nmr] = $bank;
+						$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+						$attributes['status'][$nmr] = $status_pemesanan;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "pemesanan/templates/";
+					$filename = "pemesanan_list";
+				/*}else if( $get_filter == "all") {
+					$status = 0;
+					$limit = 3;
+					$offset = ( $get_page - 1) * $limit;
+
+					$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+
+					$data= array();
+
+					$nmr = 0;
+					foreach( $invoices as $i){
+						$invoice_id = $i->id_invoice;
+
+						$invoice = new Onex_Invoice();
+						$pemesanan = new Onex_Pemesanan_Menu();
+						$distributor = new Onex_Distributor();
+						$bank = new Onex_Bank();
+						$status_pemesanan = new Onex_Status_Pemesanan();
+
+						$invoice->SetAnInvoice_Id( $invoice_id);
+						$attributes['invoice'][$nmr] = $invoice;
+						$distributor->SetADistributor( $invoice->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+						$bank->SetABank_Id( $invoice->GetBank());
+						$attributes['bank'][$nmr] = $bank;
+						$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+						$attributes['status'][$nmr] = $status_pemesanan;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "pemesanan/templates/";
+					$filename = "pemesanan_list";
+				}else if( $get_filter == "pengiriman") {
+					$status = 2;
+					$limit = 3;
+					$offset = ( $get_page - 1) * $limit;
+
+					$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+
+					$data= array();
+
+					$nmr = 0;
+					foreach( $invoices as $i){
+						$invoice_id = $i->id_invoice;
+
+						$invoice = new Onex_Invoice();
+						$pemesanan = new Onex_Pemesanan_Menu();
+						$distributor = new Onex_Distributor();
+						$bank = new Onex_Bank();
+						$status_pemesanan = new Onex_Status_Pemesanan();
+
+						$invoice->SetAnInvoice_Id( $invoice_id);
+						$attributes['invoice'][$nmr] = $invoice;
+						$distributor->SetADistributor( $invoice->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+						$bank->SetABank_Id( $invoice->GetBank());
+						$attributes['bank'][$nmr] = $bank;
+						$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+						$attributes['status'][$nmr] = $status_pemesanan;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "pemesanan/templates/";
+					$filename = "pemesanan_list";
+				}else if( $get_filter == "terkirim") {
+					$status = 3;
+					$limit = 3;
+					$offset = ( $get_page - 1) * $limit;
+
+					$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+
+					$data= array();
+
+					$nmr = 0;
+					foreach( $invoices as $i){
+						$invoice_id = $i->id_invoice;
+
+						$invoice = new Onex_Invoice();
+						$pemesanan = new Onex_Pemesanan_Menu();
+						$distributor = new Onex_Distributor();
+						$bank = new Onex_Bank();
+						$status_pemesanan = new Onex_Status_Pemesanan();
+
+						$invoice->SetAnInvoice_Id( $invoice_id);
+						$attributes['invoice'][$nmr] = $invoice;
+						$distributor->SetADistributor( $invoice->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+						$bank->SetABank_Id( $invoice->GetBank());
+						$attributes['bank'][$nmr] = $bank;
+						$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+						$attributes['status'][$nmr] = $status_pemesanan;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "pemesanan/templates/";
+					$filename = "pemesanan_list";
+				}else if( $get_filter == "batal") {
+					$status = 4;
+					$limit = 3;
+					$offset = ( $get_page - 1) * $limit;
+
+					$invoices = $this->onex_invoice_obj->GetLimitInvoice_Status( $status, $limit, $offset);
+
+					$data= array();
+
+					$nmr = 0;
+					foreach( $invoices as $i){
+						$invoice_id = $i->id_invoice;
+
+						$invoice = new Onex_Invoice();
+						$pemesanan = new Onex_Pemesanan_Menu();
+						$distributor = new Onex_Distributor();
+						$bank = new Onex_Bank();
+						$status_pemesanan = new Onex_Status_Pemesanan();
+
+						$invoice->SetAnInvoice_Id( $invoice_id);
+						$attributes['invoice'][$nmr] = $invoice;
+						$distributor->SetADistributor( $invoice->GetDistributor());
+						$attributes['distributor'][$nmr] = $distributor;
+						$attributes['total_pemesanan'][$nmr] = $pemesanan->GetTotalNilaiPesanan( $invoice_id);
+						$bank->SetABank_Id( $invoice->GetBank());
+						$attributes['bank'][$nmr] = $bank;
+						$status_pemesanan->SetAStatusPemesanan_Id( $invoice->GetStatusPemesanan() );
+						$attributes['status'][$nmr] = $status_pemesanan;
+						$nmr += 1;
+					}
+					$attributes['nomor'] = $offset + 1;
+					$dir = "pemesanan/templates/";
+					$filename = "pemesanan_list";
+				}*/
+					
 			}
 
 			echo $this->getHtmlTemplate(  $dir, $filename, $attributes);
@@ -489,6 +667,7 @@ class Onex_Plugin{
 			$invoice = new Onex_Invoice();
 			$invoice->SetAnInvoice_Id( $post_invoice);
 			$invoice->SetStatusPemesanan( $post_status);
+			if( $post_status>1) $invoice->SetStatusAdminConfirm( 1);
 			$result = $invoice->UpdateStatusPemesanan();
 			echo wp_json_encode($result);
 		}
@@ -728,6 +907,17 @@ class Onex_Plugin{
 	}
 
 	function RenderPemesananList(){
+		$statuses = new Onex_Status_Pemesanan();
+		$nmr = 0;
+		$all_status = $statuses->GetAllStatusPemesananId();
+		//var_dump($all_status);
+		foreach( $all_status as $s){
+			$id_status = $s->id_status;
+			$status = new Onex_Status_Pemesanan();
+			$status->SetAStatusPemesanan_Id($id_status);
+			$attributes['status'][$nmr] = $status;
+			$nmr += 1;
+		}
 		return $this->getHtmlTemplate(  'pemesanan/templates/', 'pemesanan_main', $attributes);
 	}
 

@@ -116,7 +116,7 @@
 			<textarea name="distributor-alamat"><?php if(!$isPosted) echo $distributor->GetALamat(); else echo $dist_alamat; ?></textarea>
 		</p>
 		<p>No. Telp<br />
-			<input type="text" name="distributor-telp" value="<?php if(!$isPosted) echo $distributor->GetTelp(); else echo $dist_telp; ?>"/>
+			<input type="number" name="distributor-telp" value="<?php if(!$isPosted) echo $distributor->GetTelp(); else echo $dist_telp; ?>"/>
 		</p>
 		<p>Email<br />
 			<input type="text" name="distributor-email" value="<?php if(!$isPosted) echo $distributor->GetEmail(); else echo $dist_email; ?>" />

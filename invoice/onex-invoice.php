@@ -249,7 +249,7 @@ class Onex_Invoice{
 		return $result;
 	}
 
-	public function GetLimitInvoice_Status( $status = 1, $limit, $offset ){
+	public function GetLimitInvoice_Status( $status = 0, $limit, $offset ){
 		/*$user_confirm = 0;
 		$admin_confirm = 0;
 		if( $status == "unconfirmed" ){
@@ -260,22 +260,37 @@ class Onex_Invoice{
 			$admin_confirm = 1;
 		}*/
 		global $wpdb;
-		$result =
-			$wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT id_invoice FROM $this->table_name
-					WHERE status_pemesanan = %d  
-					ORDER BY jam_kirim_invoice ASC
-					LIMIT %d, %d",
-					$status,
-					$offset, $limit
-					)
-				);
+
+		if( $status ==0){
+			$result =
+				$wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_invoice FROM $this->table_name
+						WHERE status_user_confirm = %d  
+						ORDER BY jam_kirim_invoice ASC
+						LIMIT %d, %d",
+						1,
+						$offset, $limit
+						)
+					);
+		}else{
+			$result =
+				$wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id_invoice FROM $this->table_name
+						WHERE status_pemesanan = %d  
+						ORDER BY jam_kirim_invoice ASC
+						LIMIT %d, %d",
+						$status,
+						$offset, $limit
+						)
+					);
+		}
 
 		return $result;
 	}
 
-	public function CountInvoiceStatus($status=1) {
+	public function CountInvoiceStatus($status=0) {
 		/*$user_confirm = 0;
 		$admin_confirm = 0;
 		if( $status == "unconfirmed" ){
@@ -288,15 +303,27 @@ class Onex_Invoice{
 
 		global $wpdb;
 
-		$row =
-			$wpdb->get_row(
-				$wpdb->prepare(
-					"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
-					WHERE status_pemesanan = %d",
-					$status
-					),
-					ARRAY_A
-				);
+		if($status==0){
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
+						WHERE status_user_confirm = %d",
+						1
+						),
+						ARRAY_A
+					);
+		}else{
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
+						WHERE status_pemesanan = %d",
+						$status
+						),
+						ARRAY_A
+					);
+		}
 		//var_dump($status, $user_confirm, $admin_confirm, $row['jumlah']);
 		return $row['jumlah'];
 	}
@@ -307,9 +334,9 @@ class Onex_Invoice{
 		if($wpdb->query(
 			$wpdb->prepare(
 				"UPDATE $this->table_name 
-				SET status_pemesanan = %d
+				SET status_pemesanan = %d, status_admin_confirm = %d
 				WHERE id_invoice = %d",
-				$this->status_pemesanan,
+				$this->status_pemesanan, $this->status_admin_confirm,
 				$this->id
 				)
 			)

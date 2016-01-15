@@ -80,7 +80,7 @@
 			<textarea name="menudist-keterangan"></textarea>
 		</p>
 		<p>Harga <strong>*</strong><br />
-			<input required type="text" name="menudist-harga" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_harga; ?>" />
+			<input required type="number" name="menudist-harga" value="<?php if(isset($result) && !$result['status'] ) echo $menudist_harga; ?>" />
 		</p>
 		<p>Gambar <strong>*</strong><br />
 			<input required type="text" name="menudist-gambar-url" id="image_url" class="regular-text" value="<?php if($isPosted && !$result['status']) echo $menudist_gambar; ?>">

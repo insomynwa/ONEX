@@ -69,7 +69,7 @@
 			<textarea name="distributor-alamat"><?php if(isset($result) && !$result['status'] ) echo $dist_alamat; ?></textarea>
 		</p>
 		<p>No. Telp<br />
-			<input type="text" name="distributor-telp" />
+			<input type="number" name="distributor-telp" />
 		</p>
 		<p>Email<br />
 			<input type="text" name="distributor-email" />

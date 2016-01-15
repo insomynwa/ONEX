@@ -30,7 +30,7 @@
 	}
 ?>
 <div class="wrap">
-
+	<h2>Update Jenis Delivery</h2>
 <?php if($_POST['katdel-update-submit'] && $success ) { ?>
 	<div class="updated">
 		<p><?php echo $message; ?></p>

@@ -26,11 +26,13 @@ if( sizeof($attributes['invoice']) > 0 ): ?>
 		<?php echo $attributes['bank'][$i]->GetNama(); ?>
 		<?php endif; ?>
 		</td>
-		<td><?php if($invoice->GetJamKirim()==$invoice->GetTanggalUserConfirm() ) echo "Sekarang"; else echo date( "j M Y, H:i", strtotime( $invoice->GetJamKirim())); ?></td>
+		<td><?php if( ($invoice->GetJamKirim()==$invoice->GetTanggalUserConfirm()) && ($invoice->GetStatusAdminConfirm()==0) ) echo "Sekarang"; else echo date( "j M Y, H:i", strtotime( $invoice->GetJamKirim())); ?></td>
 		<td><?php echo $attributes['status'][$i]->GetStatus(); ?></td>
 		<td><a class="detail-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href="#modal-invoice" >Detail</a></td>
 		<td>
+            <?php if($attributes['status'][$i]->GetId()!=3): ?>
 			<a class="konfirmasi-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href='#modal-invoice'>KONFIRMASI</a>
+            <?php endif; ?>
 		</td>
 	</tr>
 	<?php $nmr += 1; ?>

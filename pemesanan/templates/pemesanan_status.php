@@ -29,7 +29,12 @@ jQuery(document).ready(function($) {
 			$("#modal-invoice").modal('hide');
 			if( result){
 				$("#modal-invoice").html("");
-				window.doCreatePagination("pemesanan-waiting", "div#new-invoice-pagination-area");
+				//$("select#pemesanan-filter-status option:first-child").prop("selected", "selected");
+				var select_pemesanan = $("select#pemesanan-filter-status").val();
+				var forlist = select_pemesanan.substr( 0, select_pemesanan.indexOf('-'));
+				var stat = select_pemesanan.split('-').pop();
+				var limit = $("select#pemesanan-filter-limit").val();
+				window.doCreatePagination( forlist, limit, stat, "div#new-invoice-pagination-area");
 			}
 		});
 	});

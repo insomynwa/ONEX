@@ -7,7 +7,7 @@
 <script type="text/javascript">
 	jQuery(document).ready( function($){
 
-		window.doCreatePagination("menudel-all", "div#new-menudel-pagination-area");
+		window.doCreatePagination("menudel", 5, "all", "div#new-menudel-pagination-area");
 
 	});
 </script>

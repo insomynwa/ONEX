@@ -44,7 +44,7 @@
 			<input type="text" name="bank-pemilik-rekening" value="<?php if(! $isPosted) echo $attributes->GetPemilik(); else echo $bank_pemilik; ?>" />
 		</p>
 		<p>No. Rekening<strong>*</strong><br />
-			<input type="text" name="bank-no-rekening" value="<?php if(! $isPosted) echo $attributes->GetNoRekening(); else echo $bank_no_rekening; ?>" />
+			<input type="number" name="bank-no-rekening" value="<?php if(! $isPosted) echo $attributes->GetNoRekening(); else echo $bank_no_rekening; ?>" />
 		</p>
 		<p>
 			<input type="submit" name="bank-update-submit" value="Simpan" />
