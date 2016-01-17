@@ -22,6 +22,7 @@
 ?>
 
 <div class="wrap">
+	<h2>Tambah Kategori</h2>
 	<?php if( isset($message)): ?>
 	<div class="updated"><p><?php echo $message; ?></p></div>
 	<?php endif; ?>

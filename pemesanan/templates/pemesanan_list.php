@@ -1,15 +1,15 @@
 <?php 
 $nmr = $attributes['nomor'];//var_dump($attributes['invoice']);
 if( sizeof($attributes['invoice']) > 0 ): ?>
-<table class="table table-hover table-responsive">
-	<tr><th>No</th>
-		<th>Invoice</th>
-		<th>Total</th>
-		<th>Pembayaran</th>
-		<th>Jam Pengiriman</th>
-		<th>Status</th>
+<table class="table table-responsive">
+	<tr><th>NO</th>
+		<th>INVOICE</th>
+		<th>TOTAL</th>
+		<th>PEMBAYARAN</th>
+		<th>JAM KIRIM</th>
+		<th>STATUS</th>
 		<th></th>
-		<th>Manage</th>
+		<th>MANAGE</th>
 	</tr>
 <?php for( $i=0; $i<sizeof( $attributes['invoice']) ; $i++ ): ?>
 	<?php 
@@ -17,20 +17,21 @@ if( sizeof($attributes['invoice']) > 0 ): ?>
 		$total = $attributes['total_pemesanan'][$i];
 		$distributor = $attributes['distributor'][$i];
 	?>
-	<tr>
+    <?php $status = $attributes['status'][$i]; ?>
+	<tr class="<?php if($status->GetId()==1) echo 'warning'; elseif($status->GetId()==2) echo 'active'; elseif($status->GetId()==3) echo 'success'; elseif($status->GetId()==4) echo 'danger'; ?>">
 		<td><?php echo $nmr; ?></td>
 		<td><?php echo $distributor->GetKode().''.$invoice->GetUser().''.$invoice->GetNomor(); ?></td>
-		<td>Rp.<?php echo $total; ?></td>
+		<td>Rp.<?php echo number_format( $total, 0, ',','.'); ?></td>
 		<td><?php if( $invoice->GetTipeBayar() == 1) echo "Transfer "; else echo "COD"; ?>
 		<?php if( $invoice->GetTipeBayar() == 1): ?>
 		<?php echo $attributes['bank'][$i]->GetNama(); ?>
 		<?php endif; ?>
 		</td>
 		<td><?php if( ($invoice->GetJamKirim()==$invoice->GetTanggalUserConfirm()) && ($invoice->GetStatusAdminConfirm()==0) ) echo "Sekarang"; else echo date( "j M Y, H:i", strtotime( $invoice->GetJamKirim())); ?></td>
-		<td><?php echo $attributes['status'][$i]->GetStatus(); ?></td>
+		<td><strong><?php echo $status->GetStatus(); ?></strong></td>
 		<td><a class="detail-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href="#modal-invoice" >Detail</a></td>
 		<td>
-            <?php if($attributes['status'][$i]->GetId()!=3): ?>
+            <?php if($status->GetId()!=3): ?>
 			<a class="konfirmasi-link" id="invoice_<?php echo $invoice->GetId(); ?>" data-toggle="modal" href='#modal-invoice'>KONFIRMASI</a>
             <?php endif; ?>
 		</td>
@@ -72,7 +73,7 @@ jQuery(document).ready( function($) {
 	$("a.detail-link").click( function() {
         var inv = (this.id).split('_').pop();
         var data = {
-            'action' : 'AjaxRetrieveInvoiceDetail',
+            'action' : 'AjaxRetrievePemesananDetail',
             'invoice': inv
         };
 

@@ -27,10 +27,10 @@ class Onex_Kategori_Menu{
 		$this->table_distributor = "onex_distributor";
 
 		//add_action('wp_print_scripts', array( $this, 'AjaxKategoriMenuLoadScripts') );
-		add_action('wp_ajax_AjaxGetKategoriMenuList', array( $this, 'AjaxLoad_KategoriMenu_List') );
+		//add_action('wp_ajax_AjaxGetKategoriMenuList', array( $this, 'AjaxLoad_KategoriMenu_List') );
 	}
 
-	function AjaxKategoriMenuLoadScripts(){
+	/*function AjaxKategoriMenuLoadScripts(){
 		wp_localize_script( 'ajax-kategori-menu', 'ajax_one_express', array( 'ajaxurl' => admin_url( 'admin-ajax.php')) );
 	}
 
@@ -38,7 +38,7 @@ class Onex_Kategori_Menu{
 		$attributes['katmenu'] = $this->GetKategoriMenuList();
 		echo $this->getHtmlTemplate( 'templates/', 'kategori_menu_list', $attributes);
 		wp_die();
-	}
+	}*/
 
 	public function SetAKategoriMenu( $id_katmenu){
 		global $wpdb;
@@ -245,6 +245,59 @@ class Onex_Kategori_Menu{
 			);
 		$attributes = $row;
 		return $attributes;
+	}
+
+	public function CountAllKategori( $id_filter=0){
+		global $wpdb;
+
+		if( $id_filter == 0){
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_katmenu) AS jumlah FROM $this->table_name",
+						null
+						),
+						ARRAY_A
+					);
+		}else{
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_katmenu) AS jumlah
+						FROM $this->table_name
+						WHERE distributor_id = %d",
+						$id_filter
+						),
+						ARRAY_A
+					);
+		}
+		return $row['jumlah'];
+	}
+
+	public function GetAllKategoriMenu( $id_filter, $limit, $offset){
+		global $wpdb;
+		
+		if( $id_filter == 0 ){
+			$result = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT id_katmenu FROM $this->table_name
+							 LIMIT %d, %d",
+							 $offset, $limit
+						)
+					);
+		}else{
+			$result = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT id_katmenu FROM $this->table_name
+							WHERE distributor_id = %d 
+							LIMIT %d, %d",
+							$id_filter, 
+							$offset, $limit
+						)
+					);
+		}
+
+		return $result;
 	}
 
 	private function getHtmlTemplate( $location, $template_name, $attributes = null ){

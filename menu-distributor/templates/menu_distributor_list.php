@@ -4,11 +4,11 @@
 	$nmr = $attributes['nomor'];
 	if( sizeof($attributes['menu']) > 0 ): ?>
 	<table class="table table-hover table-responsive">
-		<tr><th>No</th>
-			<th>Nama Menu</th>
-			<th>Harga</th>
-			<th>Kategori</th>
-			<th>Distributor</th>
+		<tr><th>NO</th>
+			<th>MENU</th>
+			<th>HARGA</th>
+			<th>KATEGORI</th>
+			<th>DISTRIBUTOR</th>
 			<th></th>
 		</tr>
 				<?php for( $i=0; $i< sizeof($attributes['menu']) ; $i++): ?>
@@ -20,7 +20,7 @@
 					<tr>
 						<td><?php echo $nmr; ?></td>
 						<td><?php echo $menu->GetNama(); ?></td>
-						<td><?php echo $menu->GetHarga(); ?></td>
+						<td>Rp.<?php echo number_format($menu->GetHarga(), 0, ',', '.'); ?></td>
 						<td><?php echo $katmenu->GetNama(); ?></td>
 						<td><?php echo $distributor->GetNama(); ?></td>
 						<td>

@@ -1,10 +1,10 @@
 <a href='<?php echo admin_url('admin.php?page=onex-jenis-delivery-tambah'); ?>' >Tambah</a>
 <table class="table table-hover table-responsive">
-	<tr><th>No</th>
-		<th>Jenis Delivery</th>
+	<tr><th>NO</th>
+		<th>JENIS DELIVERY</th>
 		<!-- <th>Keterangan</th> -->
 		<th></th>
-		<th>Manage</th>
+		<th>MANAGE</th>
 	</tr>
 	<?php 
 		$nmr = 1;

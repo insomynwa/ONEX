@@ -2,8 +2,8 @@
 	<h2>Tarif Pengiriman</h2>
 	<div id="list-area">
 		<div>
-			<p>Tarif <span class="ongkir-jarak-minimal"><?php echo $attributes->GetJarakMinimal(); ?></span> KM pertama : Rp.<span class="ongkir-tarif-minimal"><?php echo $attributes->GetTarifMinimal(); ?></span></p>
-			<p>Tarif normal: Rp.<span class="ongkir-tarif-normal"><?php echo $attributes->GetTarifNormal(); ?></span> / KM</p>
+			<p>Tarif <span class="ongkir-jarak-minimal"><?php echo $attributes->GetJarakMinimal(); ?></span> KM pertama : Rp.<span class="ongkir-tarif-minimal"><?php echo number_format($attributes->GetTarifMinimal(), 0,',','.'); ?></span></p>
+			<p>Tarif normal: Rp.<span class="ongkir-tarif-normal"><?php echo number_format($attributes->GetTarifNormal(), 0,',','.'); ?></span> / KM</p>
 			<p><a data-toggle="modal" href="#modal-update-tarif-kirim">Update</a></p>
 		</div>
 	</div>
@@ -20,19 +20,19 @@
 						<div class="form-group">
 							<label class="control-label col-sm-3" for="email">Jarak KM pertama:</label>
 							<div class="col-sm-9">
-								<input type="text" class="form-control ongkir-jarak-minimal" id="email" placeholder="" value="<?php echo $attributes->GetJarakMinimal(); ?>">
+								<input type="number" class="form-control ongkir-jarak-minimal" id="email" placeholder="" value="<?php echo $attributes->GetJarakMinimal(); ?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-3" for="email">Tarif KM pertama:</label>
 							<div class="col-sm-9">
-								<input type="text" class="form-control ongkir-tarif-minimal" id="email" placeholder="" value="<?php echo $attributes->GetTarifMinimal(); ?>">
+								<input type="number" class="form-control ongkir-tarif-minimal" id="email" placeholder="" value="<?php echo $attributes->GetTarifMinimal(); ?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-3" for="pwd">Tarif normal / KM:</label>
 							<div class="col-sm-9"> 
-								<input type="text" class="form-control ongkir-tarif-normal" id="pwd" placeholder="" value="<?php echo $attributes->GetTarifNormal(); ?>">
+								<input type="number" class="form-control ongkir-tarif-normal" id="pwd" placeholder="" value="<?php echo $attributes->GetTarifNormal(); ?>">
 								<input type="hidden" class="ongkir-id" value="<?php echo $attributes->GetId(); ?>" />
 							</div>
 						</div>

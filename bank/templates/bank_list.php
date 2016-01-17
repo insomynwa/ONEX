@@ -1,10 +1,10 @@
 <a href='<?php echo admin_url('admin.php?page=onex-bank-tambah'); ?>' >Tambah</a>
 <table class="table table-hover table-responsive">
-	<tr><th>No</th>
-		<th>Bank</th>
-		<th>Atas Nama</th>
-		<th>No Rekening</th>
-		<th>Manage</th>
+	<tr><th>NO</th>
+		<th>BANK</th>
+		<th>ATAS NAMA</th>
+		<th>NO REKENING</th>
+		<th>MANAGE</th>
 	</tr>
 	<?php 
 		$nmr = 1;

@@ -65,6 +65,7 @@
 	}
 ?>
 <div class="wrap">
+	<h2>Update Menu</h2>
 <?php if($isPosted): ?>
 	<?php if($result['status']): ?>
 	<div class="updated">

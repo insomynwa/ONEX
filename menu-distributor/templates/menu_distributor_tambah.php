@@ -33,6 +33,7 @@
 	}
 ?>
 <div class="wrap">
+	<h2>Tambah Menu</h2>
 	<?php if(isset($result)): ?>
 	<div class="updated">
 		<p><?php echo $result['message']; ?></p>

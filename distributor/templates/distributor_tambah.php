@@ -37,6 +37,7 @@
 	}
 ?>
 <div class="wrap">
+	<h2>Tambah Distributor</h2>
 	<?php if(isset($result)): ?>
 	<div class="updated">
 		<p><?php echo $result['message']; ?></p>

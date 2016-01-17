@@ -78,17 +78,30 @@ class Onex_Menu_Distributor{
 		return $result;
 	}
 
-	public function GetAllMenu( $limit, $offset){
+	public function GetAllMenu( $id_filter, $limit, $offset){
 		global $wpdb;
 		
-		$result = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT id_menudel FROM $this->table_name
-						 ORDER BY nama_menudel ASC
-						 LIMIT %d, %d",
-						 $offset, $limit
-					)
-				);
+		if( $id_filter == 0 ){
+			$result = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT id_menudel FROM $this->table_name
+							 ORDER BY nama_menudel ASC
+							 LIMIT %d, %d",
+							 $offset, $limit
+						)
+					);
+		}else{
+			$result = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT id_menudel FROM $this->table_name
+							WHERE distributor_id = %d 
+							ORDER BY nama_menudel ASC
+							LIMIT %d, %d",
+							$id_filter, 
+							$offset, $limit
+						)
+					);
+		}
 
 		return $result;
 	}
@@ -134,17 +147,31 @@ class Onex_Menu_Distributor{
 		return $attributes;
 	}
 
-	public function CountAllMenu(){
+	public function CountAllMenu( $id_filter = 0){
 		global $wpdb;
 
-		$row =
-			$wpdb->get_row(
-				$wpdb->prepare(
-					"SELECT COUNT(id_menudel) AS jumlah FROM $this->table_name",
-					null
-					),
-					ARRAY_A
-				);
+		if( $id_filter==0 ){
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_menudel) AS jumlah FROM $this->table_name",
+						null
+						),
+						ARRAY_A
+					);
+		}else{
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT COUNT(id_menudel) AS jumlah
+						FROM $this->table_name
+						WHERE distributor_id = %d",
+						$id_filter
+						),
+						ARRAY_A
+					);
+		}
+		
 
 		return $row['jumlah'];
 	}

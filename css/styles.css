@@ -7,3 +7,16 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.table tr.warning td {
+    background-color: rgba(255,255,0,.7) !important;
+}
+.table tr.active td {
+    background-color: rgba(50,255,0,.4) !important;
+}
+.table tr.success td {
+    background-color: rgba(0,255,0,.7) !important;
+}
+.table tr.danger td {
+    background-color: rgba(255,0,0,.5) !important;
+}

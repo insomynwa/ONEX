@@ -249,23 +249,15 @@ class Onex_Invoice{
 		return $result;
 	}
 
-	public function GetLimitInvoice_Status( $status = 0, $limit, $offset ){
-		/*$user_confirm = 0;
-		$admin_confirm = 0;
-		if( $status == "unconfirmed" ){
-			$user_confirm = 1;
-			$admin_confirm = 0;
-		}else if( $status == "confirmed") {
-			$user_confirm = 1;
-			$admin_confirm = 1;
-		}*/
+	public function GetLimitInvoice_Status( $id_filter_dist = 0, $id_filter_status = 0, $limit, $offset ){
 		global $wpdb;
+		$select_str = "SELECT id_invoice FROM $this->table_name ";
 
-		if( $status ==0){
+		if( $id_filter_dist == 0 && $id_filter_status == 0 ){
 			$result =
 				$wpdb->get_results(
 					$wpdb->prepare(
-						"SELECT id_invoice FROM $this->table_name
+						"$select_str
 						WHERE status_user_confirm = %d  
 						ORDER BY jam_kirim_invoice ASC
 						LIMIT %d, %d",
@@ -273,43 +265,79 @@ class Onex_Invoice{
 						$offset, $limit
 						)
 					);
+		}else if( $id_filter_dist != 0 && $id_filter_status==0 ){
+			$result =
+				$wpdb->get_results(
+					$wpdb->prepare(
+						"$select_str
+						WHERE distributor_id = %d AND status_user_confirm = %d
+						ORDER BY jam_kirim_invoice ASC
+						LIMIT %d, %d",
+						$id_filter_dist,1,
+						$offset, $limit
+						)
+					);
+		}else if( $id_filter_dist == 0 && $id_filter_status != 0 ){
+			$result =
+				$wpdb->get_results(
+					$wpdb->prepare(
+						"$select_str
+						WHERE status_pemesanan = %d AND status_user_confirm = %d 
+						ORDER BY jam_kirim_invoice ASC
+						LIMIT %d, %d",
+						$id_filter_status,1,
+						$offset, $limit
+						)
+					);
 		}else{
 			$result =
 				$wpdb->get_results(
 					$wpdb->prepare(
-						"SELECT id_invoice FROM $this->table_name
-						WHERE status_pemesanan = %d  
+						"$select_str
+						WHERE status_pemesanan = %d AND distributor_id = %d AND status_user_confirm = %d
 						ORDER BY jam_kirim_invoice ASC
 						LIMIT %d, %d",
-						$status,
+						$id_filter_status, $id_filter_dist,1,
 						$offset, $limit
 						)
 					);
 		}
+		//var_dump($result);
 
 		return $result;
 	}
 
-	public function CountInvoiceStatus($status=0) {
-		/*$user_confirm = 0;
-		$admin_confirm = 0;
-		if( $status == "unconfirmed" ){
-			$user_confirm = 1;
-			$admin_confirm = 0;
-		}else if( $status == "confirmed") {
-			$user_confirm = 1;
-			$admin_confirm = 1;
-		}*/
-
+	public function CountInvoiceStatus( $id_filter_dist, $id_filter_status) {
 		global $wpdb;
+		$select_str = "SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name ";
 
-		if($status==0){
+		if( $id_filter_dist == 0 && $id_filter_status == 0 ){
 			$row =
 				$wpdb->get_row(
 					$wpdb->prepare(
-						"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
+						"$select_str
 						WHERE status_user_confirm = %d",
 						1
+						),
+						ARRAY_A
+					);
+		}else if( $id_filter_dist != 0 && $id_filter_status==0){
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"$select_str
+						WHERE distributor_id = %d AND status_user_confirm = %d",
+						$id_filter_dist,1
+						),
+						ARRAY_A
+					);
+		}else if( $id_filter_dist == 0 && $id_filter_status != 0){
+			$row =
+				$wpdb->get_row(
+					$wpdb->prepare(
+						"$select_str
+						WHERE status_pemesanan = %d AND status_user_confirm = %d ",
+						$id_filter_status, 1
 						),
 						ARRAY_A
 					);
@@ -317,9 +345,10 @@ class Onex_Invoice{
 			$row =
 				$wpdb->get_row(
 					$wpdb->prepare(
-						"SELECT COUNT(id_invoice) AS jumlah FROM $this->table_name
-						WHERE status_pemesanan = %d",
-						$status
+						"$select_str
+						WHERE status_pemesanan = %d
+						AND distributor_id == %d AND status_user_confirm = %d",
+						$id_filter_status, $id_filter_dist, 1
 						),
 						ARRAY_A
 					);

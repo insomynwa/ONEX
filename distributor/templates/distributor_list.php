@@ -4,12 +4,12 @@
 <!-- <a href="#" class="ajax-link">TEST AJAX</a>
 <p class="test-message"></p> -->
 <table class="table table-responsive table-hover">
-	<tr><th>No</th>
-		<th>Distributor</th>
+	<tr><th>NO</th>
+		<th>DISTRIBUTOR</th>
 		<!-- <th>Gambar</th> -->
-		<th>Jenis Delivery</th>
+		<th>JENIS DELIVERY</th>
 		<th></th>
-		<th>Manage</th>
+		<th>MANAGE</th>
 	</tr>
 	<?php 
 		//$nmr = 0;
@@ -53,12 +53,6 @@
 			});
 
 		});
-
-		/*$("a.distributor-tambah-link").click( function(){
-			$.get(ajax_one_express.ajaxurl, { action: 'AjaxAddDistributor' }, function(response){
-				$("div#distributor-detail-area").html(response);
-			});
-		});*/
 
 	});
 </script>

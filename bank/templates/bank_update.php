@@ -26,6 +26,7 @@
 	}
 ?>
 <div class="wrap">
+	<h2>Update Bank</h2>
 <?php if($isPosted && $result['status'] ) { ?>
 	<div class="updated">
 		<p><?php echo $result['message']; ?></p>

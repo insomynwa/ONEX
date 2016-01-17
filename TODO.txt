@@ -30,3 +30,4 @@ delete tgl_konfirmasi admin DONE
 menu_distributor_update.php 
 	create invoice if change distributor  ?????
 	harga only number DONE
+add table data_penerima DONE
